@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - FastAPI</title>
+</head>
+<body>
+    <h1>Login</h1>
+    <form id="login-form">
+        <label>Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
+        <label>Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+        document.getElementById("login-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            const response = await fetch("/token", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({
+                    "username": username,
+                    "password": password
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                alert("Login bem-sucedido!");
+            } else {
+                alert("Erro no login. Tente novamente.");
+            }
+        });
+    </script>
+</body>
+</html>

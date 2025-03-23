@@ -1,0 +1,48 @@
+body{
+    background-color: rgb(211, 216, 216);
+}
+header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 5px;
+
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-around;
+    border-bottom: 0.5px solid #0000007c;
+    
+}
+
+.navbar nav a {
+    padding: 5px 10px; 
+    margin: 0 5px;     
+    text-decoration: none;
+    color: black;
+    transition: color 0.3s;
+}
+
+.navbar nav a:hover {
+    color: gray;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    /*box-shadow: 1px 1px 2px 1px rgba(0, 0, 0, 0.2);*/
+    border-radius: 5px;
+}
+.logo {
+    height: 150px;
+    width: auto;
+}
+
+.buttons-container {
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+}

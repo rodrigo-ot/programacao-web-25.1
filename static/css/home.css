@@ -1,5 +1,5 @@
 body{
-    background-color: rgb(211, 216, 216);
+    background-color: rgb(54, 99, 99);
 }
 header{
     display: flex;
@@ -36,7 +36,7 @@ header{
     border-radius: 5px;
 }
 .logo {
-    height: 150px;
+    height: 330px;
     width: auto;
 }
 

@@ -27,6 +27,10 @@ async def read_index(request: Request):
 async def read_home(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
+@app.get("/register-page", response_class=HTMLResponse)
+async def read_home(request: Request):
+    return templates.TemplateResponse("register-page.html", {"request": request})
+
 @app.get("/users", response_model=List[User])
 async def get_users():
     return list(fake_users_db.values())

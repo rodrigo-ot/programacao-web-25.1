@@ -5,35 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <link rel="stylesheet" type="text/css" href="/static/css/home.css">
-    
+    <link rel="shortcut icon" href="/static/imgs/imgs/logo.png" type="image/x-icon">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 
 </head>
 <body>
     <header>
-        <div class="logo-container">
-            <img src="static\imgs\imgs\ReceitaFacil.png" alt="Receita Fácil" class="logo">
-        </div>
-        <div class="navbar">
-            <nav>
-                <a href="">Início</a>
-                <a href="">Sobre</a>
-                <a href="">Contato</a>
-         </nav>
-        </div>
-        <div class="buttons-container">
-            <button type="button" class="btn btn-secondary btn-sm d-block w-100 mb-2">Acessar Conta</button>
-            <button type="button" class="btn btn-primary btn-sm w-100 d-block">Cadastrar</button>
+        <div class="container-fluid d-flex justify-content-between align-items-center px-4">
+            <div class="logo-container" style=" margin-left: 2%;">
+                <img src="static\imgs\imgs\logo.png" alt="Receita Fácil" class="logo img-fluid" style="max-height: 150px;">
+            </div>
+
+            <nav class="navbar navbar-expand-lg">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse border-bottom" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link text-dark">Início</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link text-dark">Sobre</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link text-dark">Contato</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="buttons-container" style="margin-right: 5%;">
+                <button id="auth-button" type="button" class="btn btn-secondary btn-sm d-block w-100 mb-2" style="margin-right: 40px"></button>
+            </div>
         </div>
     </header>
 
+    
 
+   
    <script>
+    // const token = localStorage.getItem("token");
+    // if (!token) {
+    //     alert("Você precisa fazer login primeiro!");
+    //     window.location.href = "/login"; 
+    // }
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const authButton = document.getElementById("auth-button");
     const token = localStorage.getItem("token");
-    if (!token) {
-        alert("Você precisa fazer login primeiro!");
-        window.location.href = "/login"; 
+
+    if (token) {
+        authButton.textContent = "Encerrar Sessão";
+        authButton.classList.remove("btn-danger");
+        authButton.classList.add("btn-secondary");
+
+        authButton.addEventListener("click", function () {
+            localStorage.removeItem("token"); 
+            window.location.reload(); 
+        });
+    } else {
+        authButton.textContent = "Acessar Conta";
+        authButton.classList.remove("btn-secondary");
+        authButton.classList.add("btn-danger");
+
+        authButton.addEventListener("click", function () {
+            window.location.href = "/auth"; 
+        });
     }
+});
    </script>
 </body>
 </html>

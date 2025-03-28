@@ -7,10 +7,13 @@ from routers.auth_routes import auth_router
 from security import get_current_active_user
 from security import fake_users_db
 from models import User
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
+
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
 templates = Jinja2Templates(directory="templates")
 
 app.include_router(auth_router)
@@ -19,9 +22,9 @@ app.include_router(auth_router)
 async def read_users_me(current_user = Depends(get_current_active_user)):
     return {"username": current_user.username}
 
-@app.get("/login", response_class=HTMLResponse)
+@app.get("/auth", response_class=HTMLResponse)
 async def read_index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("authentication.html", {"request": request})
 
 @app.get("/home", response_class=HTMLResponse)
 async def read_home(request: Request):

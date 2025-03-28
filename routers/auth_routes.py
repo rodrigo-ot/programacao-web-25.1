@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import JSONResponse
 from security import get_password_hash, authenticate_user, create_access_token, get_current_active_user, fake_users_db
 from models import UserRegistration, Token
 from fastapi.security import OAuth2PasswordRequestForm
@@ -9,9 +10,16 @@ auth_router = APIRouter()
 @auth_router.post("/register")
 def register_user(user: UserRegistration):
     if user.username in fake_users_db:
-        raise HTTPException(status_code=400, detail="Username already registered")
+        return JSONResponse(
+            status_code=400,
+            content={"message": "Username already registered"}
+        )
     if any(u['email'] == user.email for u in fake_users_db.values()):
-        raise HTTPException(status_code=400, detail="Email already registered")
+        return JSONResponse(
+            status_code=400,
+            content={"message": "Email already registered"}
+        )
+    
     hashed_password = get_password_hash(user.password)
     fake_users_db[user.username] = {
         "username": user.username,
@@ -19,7 +27,8 @@ def register_user(user: UserRegistration):
         "hashed_password": hashed_password,
         "disabled": False,
     }
-    return {"message": "User registered successfully"}
+    
+    return {"message": "Cadastrado realizado com sucesso, faça Login!"}
 
 
 

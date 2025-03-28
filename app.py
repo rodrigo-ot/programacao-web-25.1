@@ -2,7 +2,7 @@ import os
 from sqlalchemy.orm import Session
 from database import get_db
 from models import Receita
-from typing import List
+from typing import List, Optional
 from fastapi import FastAPI, Request, Depends, Form, File, UploadFile
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles

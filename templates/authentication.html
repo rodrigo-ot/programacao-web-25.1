@@ -48,8 +48,14 @@
                         <div class="mb-3">
                             <input type="password" id="register-confirm-password" name="confirmed-password" class="form-control" placeholder="Confirmar senha" required>
                         </div>
-    
-                        <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
+                        <div class="mb-3">
+                            <label for="register-role" class="form-label">Tipo de conta</label>
+                            <select id="register-role" name="role" class="form-control" required>
+                                <option value="client">Cliente</option>
+                                <option value="creator">Criador de Receita</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100" style="margin-top: 10px;">Cadastrar</button>
                     </form>
                 </div>
             </div>

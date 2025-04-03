@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import JSONResponse
-from security import get_password_hash, authenticate_user, create_access_token, get_current_active_user, fake_users_db
-from models import UserRegistration, Token
+from security import get_current_active_user, get_password_hash, authenticate_user, create_access_token, fake_users_db
+from models import User, UserRegistration, Token
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 
@@ -26,6 +26,7 @@ def register_user(user: UserRegistration):
         "email": user.email,
         "hashed_password": hashed_password,
         "disabled": False,
+        "role": user.role
     }
     
     return {"message": "Cadastrado realizado com sucesso, faça Login!"}
@@ -45,3 +46,10 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={"sub": user.username}, expires_delta=timedelta(minutes=30)
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@auth_router.post("/create-recipe")
+def create_recipe(user: User = Depends(get_current_active_user)):
+    if user.role != "creator":
+        raise HTTPException(status_code=403, detail="Você não tem permissão para acessar esta rota.")
+    

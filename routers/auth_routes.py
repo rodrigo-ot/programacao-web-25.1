@@ -1,55 +1,57 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
-from security import get_current_active_user, get_password_hash, authenticate_user, create_access_token, fake_users_db
-from models import User, UserRegistration, Token
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
 from datetime import timedelta
+from models import UserRegistration, Token, User
+from models import UserDB
+from security import (
+    get_current_active_user, get_password_hash, authenticate_user,
+    create_access_token, get_db
+)
 
 auth_router = APIRouter()
 
 @auth_router.post("/register")
-def register_user(user: UserRegistration):
-    if user.username in fake_users_db:
-        return JSONResponse(
-            status_code=400,
-            content={"message": "Username already registered"}
-        )
-    if any(u['email'] == user.email for u in fake_users_db.values()):
-        return JSONResponse(
-            status_code=400,
-            content={"message": "Email already registered"}
-        )
-    
+def register_user(user: UserRegistration, db: Session = Depends(get_db)):
+    if db.query(UserDB).filter(UserDB.username == user.username).first():
+        raise HTTPException(status_code=400, detail="Username already registered")
+    if db.query(UserDB).filter(UserDB.email == user.email).first():
+        raise HTTPException(status_code=400, detail="Email already registered")
+
     hashed_password = get_password_hash(user.password)
-    fake_users_db[user.username] = {
-        "username": user.username,
-        "email": user.email,
-        "hashed_password": hashed_password,
-        "disabled": False,
-        "role": user.role
-    }
-    
-    return {"message": "Cadastrado realizado com sucesso, faça Login!"}
+    db_user = UserDB(
+        username=user.username,
+        email=user.email,
+        hashed_password=hashed_password,
+        disabled=False,
+        role=user.role 
+    )
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
 
+    return {"message": "Cadastrado com sucesso!"}
 
-
-@auth_router.post("/token")
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
-    user = authenticate_user(fake_users_db, form_data.username, form_data.password)
+@auth_router.post("/token", response_model=Token)
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=401,
-            detail="Incorrect username or password",
+            detail="Usuário ou senha incorretos",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=timedelta(minutes=30)
+        data={"sub": user.username},
+        expires_delta=timedelta(minutes=30)
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-
-@auth_router.post("/create-recipe")
-def create_recipe(user: User = Depends(get_current_active_user)):
-    if user.role != "creator":
-        raise HTTPException(status_code=403, detail="Você não tem permissão para acessar esta rota.")
-    
+# @auth_router.get("/create-recipe")
+# def create_recipe(user: User = Depends(get_current_active_user)):
+#     if user.role != "creator":
+#         raise HTTPException(status_code=403, detail="Você não tem permissão para acessar esta rota.")

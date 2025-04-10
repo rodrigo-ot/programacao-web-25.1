@@ -10,8 +10,17 @@ from typing import List, Annotated
 from database import SessionLocal, engine
 from sqlalchemy.orm import Session
 from datetime import datetime
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Ou especifique sua origem, tipo http://127.0.0.1:5500
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],  # Isso é ESSENCIAL para aceitar o Authorization
+)
 
 from models import Base
 Base.metadata.create_all(bind=engine)

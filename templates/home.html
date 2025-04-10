@@ -60,13 +60,15 @@
 
    <script>
 
-    function goToAdminPage() {
+function goToAdminPage() {
     const token = localStorage.getItem("token");
 
     fetch("http://127.0.0.1:8001/admin-page", {
         method: "GET",
+        mode: "cors",
         headers: {
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
         }
     })
     .then(res => {

@@ -59,11 +59,11 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         role: str = payload.get("role")
-        print(f"Decoded Token: username={username}, role={role}")
+        #print(f"Decoded Token: username={username}, role={role}")
         if username is None or role is None:
             raise credentials_exception
     except JWTError as e:
-        print(f"JWT Error: {e}")
+        #print(f"JWT Error: {e}")
         raise credentials_exception
 
     user = db.query(UserDB).filter(UserDB.username == username).first()

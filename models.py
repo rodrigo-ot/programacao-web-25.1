@@ -41,4 +41,4 @@ class UserDB(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     disabled = Column(Boolean, default=False)
-    role = Column(String, default="user")  
+    role = Column(String, default="client")

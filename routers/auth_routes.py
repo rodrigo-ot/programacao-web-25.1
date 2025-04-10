@@ -6,8 +6,8 @@ from datetime import timedelta
 from models import UserRegistration, Token, User
 from models import UserDB
 from security import (
-    get_current_active_user, get_password_hash, authenticate_user,
-    create_access_token, get_db
+    get_current_user, get_password_hash, authenticate_user,
+    create_access_token, get_db, require_role
 )
 
 auth_router = APIRouter()
@@ -31,7 +31,7 @@ def register_user(user: UserRegistration, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_user)
 
-    return {"message": "Cadastrado com sucesso!"}
+    return {"message": "User registered successfully"}
 
 @auth_router.post("/token", response_model=Token)
 async def login_for_access_token(
@@ -46,7 +46,7 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token = create_access_token(
-        data={"sub": user.username},
+        data={"sub": user.username, "role": user.role},
         expires_delta=timedelta(minutes=30)
     )
     return {"access_token": access_token, "token_type": "bearer"}
@@ -55,3 +55,11 @@ async def login_for_access_token(
 # def create_recipe(user: User = Depends(get_current_active_user)):
 #     if user.role != "creator":
 #         raise HTTPException(status_code=403, detail="Você não tem permissão para acessar esta rota.")
+
+# @auth_router.get("/create-recipe")
+# def create_recipe(
+#     user: UserDB = Depends(require_role("creator")),
+#     db: Session = Depends(get_db)
+# ):
+#     # Only users with the "creator" role can access this route
+#     return {"message": "Recipe created successfully"}

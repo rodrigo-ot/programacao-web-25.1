@@ -38,27 +38,48 @@ def authenticate_user(db: Session, username: str, password: str):
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
-    to_encode.update({"exp": expire})
+    to_encode.update({
+        "exp": expire,
+        "sub": data.get("sub"), 
+        "role": data.get("role") 
+    })
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 from fastapi.security import OAuth2PasswordBearer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/token")
 
-def get_current_active_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
+        status_code=401,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
-        if username is None:
+        role: str = payload.get("role")
+        print(f"Decoded Token: username={username}, role={role}")
+        if username is None or role is None:
             raise credentials_exception
-    except JWTError:
+    except JWTError as e:
+        print(f"JWT Error: {e}")
         raise credentials_exception
-    user = get_user_by_username(db, username)
+
+    user = db.query(UserDB).filter(UserDB.username == username).first()
     if user is None or user.disabled:
+        print("User not found or disabled")
         raise credentials_exception
+
+    user.role = role
     return user
+
+def require_role(required_role: str):
+    def role_checker(user = Depends(get_current_user)):
+        if user.role != required_role: 
+            raise HTTPException(
+                status_code=403,
+                detail="Access forbidden: insufficient permissions"
+            )
+        return user
+    return role_checker

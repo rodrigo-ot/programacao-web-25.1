@@ -1,23 +1,16 @@
-import os
-from datetime import datetime
-
-from fastapi import FastAPI, Request, Depends, HTTPException, Form, File, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-
-from pydantic import BaseModel
-
-from typing import List, Optional, Annotated
-
-from sqlalchemy.orm import Session
-
-from database import get_db, SessionLocal, engine
-from models import Receita, User, UserDB
-
 from routers.auth_routes import auth_router
 from security import get_current_user, require_role
+from models import User, UserDB 
+from pydantic import BaseModel
+from typing import List, Annotated
+from database import SessionLocal, engine
+from sqlalchemy.orm import Session
+from datetime import datetime
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()

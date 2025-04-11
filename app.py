@@ -1,16 +1,24 @@
-from fastapi import FastAPI, Request, Depends, HTTPException
+import os
+from datetime import datetime
+
+from fastapi import FastAPI, Request, Depends, HTTPException, Form, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+
+from pydantic import BaseModel
+
+from typing import List, Optional, Annotated
+
+from sqlalchemy.orm import Session
+
+from database import get_db, SessionLocal, engine
+from models import Receita, User, UserDB
+
 from routers.auth_routes import auth_router
 from security import get_current_user, require_role
-from models import User, UserDB 
-from pydantic import BaseModel
-from typing import List, Annotated
-from database import SessionLocal, engine
-from sqlalchemy.orm import Session
-from datetime import datetime
-from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
 
@@ -71,6 +79,7 @@ async def read_home(request: Request):
 #     return templates.TemplateResponse("register-page.html", {"request": request})
 
 @app.get("/users", response_model=List[User])
+
 async def list_users(db: db_dependency):
     return db.query(UserDB).all()
 
@@ -97,3 +106,4 @@ def create_recipe(
 @app.get("/admin-page", response_class=HTMLResponse, dependencies=[Depends(require_role("creator"))])
 def admin_page(request: Request):
     return templates.TemplateResponse("admin.html", {"request": request})
+

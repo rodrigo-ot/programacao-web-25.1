@@ -1,7 +1,9 @@
+from typing import Optional
 from pydantic import BaseModel
 from sqlalchemy import Boolean, Column, Integer, String, DateTime
 from datetime import datetime
 from database import Base
+
 
 class Token(BaseModel):
     access_token: str
@@ -22,6 +24,7 @@ class UserRegistration(BaseModel):
     username: str
     email: str
     password: str
+
     role: str 
 
 
@@ -42,3 +45,4 @@ class UserDB(Base):
     hashed_password = Column(String)
     disabled = Column(Boolean, default=False)
     role = Column(String, default="client")
+

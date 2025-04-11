@@ -1,6 +1,7 @@
 from pydantic import BaseModel
-from sqlalchemy import Boolean, Column, Integer, String, DateTime
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Table
 from datetime import datetime
+from sqlalchemy.orm import relationship
 from database import Base
 
 class Token(BaseModel):
@@ -42,3 +43,24 @@ class UserDB(Base):
     hashed_password = Column(String)
     disabled = Column(Boolean, default=False)
     role = Column(String, default="client")
+
+class Ingredient(Base):
+    __tablename__ = "ingredients"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+
+class Recipe(Base):
+    __tablename__ = "recipes"
+    id = Column(Integer, primary_key=True)
+    title = Column(String)
+    description = Column(String)
+
+    ingredients = relationship("Ingredient", secondary="recipe_ingredients", backref="recipes")
+
+recipe_ingredients = Table(
+    "recipe_ingredients",
+    Base.metadata,
+    Column("recipe_id", ForeignKey("recipes.id"), primary_key=True),
+    Column("ingredient_id", ForeignKey("ingredients.id"), primary_key=True)
+)

@@ -17,28 +17,14 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Ou especifique sua origem, tipo http://127.0.0.1:5500
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],  # Isso é ESSENCIAL para aceitar o Authorization
+    allow_headers=["*"],  
 )
 
 from models import Base
 Base.metadata.create_all(bind=engine)
-
-# # Schemas Pydantic
-# class RecipeBase(BaseModel):
-#     title: str
-#     description: str
-
-# class RecipeCreate(RecipeBase):
-#     post_time: datetime = datetime.now()
-
-# class RecipeResponse(RecipeBase):
-#     id: int
-#     post_time: datetime
-#     class Config:
-#         orm_mode = True
 
 
 def get_db():
@@ -76,17 +62,6 @@ async def read_home(request: Request):
 async def list_users(db: db_dependency):
     return db.query(UserDB).all()
 
-# @app.post("/recipes/", response_model=RecipeResponse)
-# async def create_recipe(recipe: RecipeCreate, db: db_dependency):
-#     db_recipe = Recipe(
-#         title=recipe.title,
-#         description=recipe.description,
-#         post_time=recipe.post_time
-#     )
-#     db.add(db_recipe)
-#     db.commit()
-#     db.refresh(db_recipe)
-#     return db_recipe
 
 @app.get("/create-recipe", dependencies=[Depends(require_role("creator"))])
 def create_recipe(

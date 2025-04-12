@@ -38,7 +38,7 @@
             <div class="buttons-container" style="margin-right: 5%;">
                 <button id="auth-button" type="button" class="btn btn-secondary btn-sm d-block w-100 mb-2" style="margin-right: 40px"></button>
             </div>
-            <button class="btn btn-primary" onclick="goToAdminPage()">Abrir Admin</button>
+            <button class="btn btn-primary" onclick="createRecipeModel()">Publicar Receita</button>
 
         </div>
     </header>
@@ -60,7 +60,7 @@
 
    <script>
 
-function goToAdminPage() {
+function createRecipeModel() {
     const token = localStorage.getItem("token");
 
     fetch("http://127.0.0.1:8001/admin-page", {
@@ -90,7 +90,7 @@ function goToAdminPage() {
 }
 
 function closeModal() {
-    const modal = document.getElementById("adminModal");
+    const modal = document.getElementById("RecipeModal");
     modal.style.display = "none";
 
     document.body.classList.remove("blurred");

@@ -1,3 +1,4 @@
+from typing import List, Optional
 from pydantic import BaseModel
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Table
 from datetime import datetime
@@ -55,6 +56,7 @@ class Recipe(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String)
     description = Column(String)
+    image_url = Column(String, nullable=True)
 
     ingredients = relationship("Ingredient", secondary="recipe_ingredients", backref="recipes")
 
@@ -64,3 +66,27 @@ recipe_ingredients = Table(
     Column("recipe_id", ForeignKey("recipes.id"), primary_key=True),
     Column("ingredient_id", ForeignKey("ingredients.id"), primary_key=True)
 )
+
+class IngredientBase(BaseModel):
+    name: str
+
+class IngredientResponse(IngredientBase):
+    id: int
+    class Config:
+        orm_mode = True
+
+class RecipeCreate(BaseModel):
+    title: str
+    description: str
+    ingredients: List[str]  # apenas os nomes
+    image_url: Optional[str] = None
+
+class RecipeResponse(BaseModel):
+    id: int
+    title: str
+    description: str
+    image_url: Optional[str]
+    ingredients: List[IngredientResponse]
+
+    class Config:
+        orm_mode = True

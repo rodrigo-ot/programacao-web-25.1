@@ -4,15 +4,17 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from routers.auth_routes import auth_router
 from security import get_current_user, require_role
-from models import User, UserDB 
+from models import Recipe, User, UserDB 
 from pydantic import BaseModel
 from typing import List, Annotated
 from database import SessionLocal, engine
 from sqlalchemy.orm import Session
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
+from routers import recipes
 
 app = FastAPI()
+app.include_router(recipes.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -86,14 +88,16 @@ async def list_users(db: db_dependency):
 #     db.refresh(db_recipe)
 #     return db_recipe
 
-@app.get("/create-recipe", dependencies=[Depends(require_role("creator"))])
-def create_recipe(
-    #
-    #
-):
-    return {"message": f"Recipe created"}
 
 
 @app.get("/admin-page", response_class=HTMLResponse, dependencies=[Depends(require_role("creator"))])
 def admin_page(request: Request):
     return templates.TemplateResponse("admin.html", {"request": request})
+
+@app.get("/receitas-page", response_class=HTMLResponse)
+def receitas_page(request: Request):
+    return templates.TemplateResponse("recipes.html", {"request": request})
+
+@app.get("/auth/status")
+async def auth_status(user: User = Depends(get_current_user)):
+    return {"is_authenticated": True}

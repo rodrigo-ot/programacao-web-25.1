@@ -11,6 +11,7 @@ from security import (
 )
 
 auth_router = APIRouter()
+router = APIRouter()
 
 @auth_router.post("/register")
 def register_user(user: UserRegistration, db: Session = Depends(get_db)):
@@ -63,3 +64,11 @@ async def login_for_access_token(
 # ):
 #     # Only users with the "creator" role can access this route
 #     return {"message": "Recipe created successfully"}
+
+
+@router.get("/me")
+def get_user_info(user = Depends(get_current_user)):
+    return {
+        "username": user.username,
+        "role": user.role
+    }

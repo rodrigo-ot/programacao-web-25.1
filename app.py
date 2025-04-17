@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Depends, HTTPException
+from fastapi import APIRouter, FastAPI, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -15,13 +15,14 @@ from routers import recipes
 
 app = FastAPI()
 app.include_router(recipes.router)
+router = APIRouter()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Ou especifique sua origem, tipo http://127.0.0.1:5500
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],  # Isso é ESSENCIAL para aceitar o Authorization
+    allow_headers=["*"],
 )
 
 from models import Base
@@ -56,9 +57,9 @@ templates = Jinja2Templates(directory="templates")
 
 app.include_router(auth_router)
 
-@app.get("/users/me/", response_class=HTMLResponse)
-async def read_users_me(current_user = Depends(get_current_user)):
-    return {"username": current_user.username}
+# @app.get("/users/me/", response_class=HTMLResponse)
+# async def read_users_me(current_user = Depends(get_current_user)):
+#     return {"username": current_user.username}
 
 @app.get("/auth", response_class=HTMLResponse)
 async def read_index(request: Request):
@@ -68,31 +69,9 @@ async def read_index(request: Request):
 async def read_home(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
-# @app.get("/register-page", response_class=HTMLResponse)
-# async def read_register_page(request: Request):
-#     return templates.TemplateResponse("register-page.html", {"request": request})
-
 @app.get("/users", response_model=List[User])
 async def list_users(db: db_dependency):
     return db.query(UserDB).all()
-
-# @app.post("/recipes/", response_model=RecipeResponse)
-# async def create_recipe(recipe: RecipeCreate, db: db_dependency):
-#     db_recipe = Recipe(
-#         title=recipe.title,
-#         description=recipe.description,
-#         post_time=recipe.post_time
-#     )
-#     db.add(db_recipe)
-#     db.commit()
-#     db.refresh(db_recipe)
-#     return db_recipe
-
-
-
-@app.get("/admin-page", response_class=HTMLResponse, dependencies=[Depends(require_role("creator"))])
-def admin_page(request: Request):
-    return templates.TemplateResponse("admin.html", {"request": request})
 
 @app.get("/receitas-page", response_class=HTMLResponse)
 def receitas_page(request: Request):
@@ -101,3 +80,16 @@ def receitas_page(request: Request):
 @app.get("/auth/status")
 async def auth_status(user: User = Depends(get_current_user)):
     return {"is_authenticated": True}
+
+@router.get("/nova-receita", response_class=HTMLResponse)
+def nova_receita_page(request: Request):
+    return templates.TemplateResponse("post_recipe.html", {"request": request})
+
+@router.get("/me")
+def get_user_info(user = Depends(get_current_user)):
+    return {
+        "username": user.username,
+        "role": user.role
+    }
+
+app.include_router(router)

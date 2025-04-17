@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postar Receita</title>
+</head>
+<body>
+    <h1>Postar Receita</h1>
+    
+    <!-- Formulário para criar uma receita -->
+    <form id="recipe-form">
+        <label for="title">Título:</label><br>
+        <input type="text" id="title" name="title" required><br><br>
+        <label for="description">Descrição:</label><br>
+        <textarea id="description" name="description" required></textarea><br><br>
+        <label for="image_url">URL da Imagem:</label><br>
+        <input type="url" id="image_url" name="image_url" required><br><br>
+        <label for="ingredients">Ingredientes (separe por vírgula):</label><br>
+        <input type="text" id="ingredients" name="ingredients" required><br><br>
+        <button type="submit">Criar Receita</button>
+    </form>
+
+    <script>
+    window.onload = async function () {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Você precisa estar logado.");
+            window.location.href = "/auth";
+            return;
+        }
+
+        try {
+            const response = await fetch("/me", {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error("Token inválido");
+            }
+
+            const user = await response.json();
+            if (user.role !== "creator") {
+                alert("Acesso negado. Sua conta não deve criar receitas.");
+                window.location.href = "/home";
+            }
+
+            console.log("Usuário autenticado como creator:", user.username);
+        } catch (err) {
+            console.error(err);
+            alert("Apenas Criadores podem postar receitas.");
+            window.location.href = "/auth";
+        }
+    };
+
+    document.getElementById("recipe-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("Você precisa estar logado.");
+                window.location.href = "/login";
+                return;
+            }
+
+            const title = document.getElementById("title").value;
+            const description = document.getElementById("description").value;
+            const image_url = document.getElementById("image_url").value;
+            const ingredients = document.getElementById("ingredients").value.split(',');
+
+            const response = await fetch("/post-recipe", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`  
+                },
+                body: JSON.stringify({
+                    title: title,
+                    description: description,
+                    image_url: image_url,
+                    ingredients: ingredients
+                })
+            });
+
+            if (response.ok) {
+                const newRecipe = await response.json();
+                alert("Receita criada com sucesso!");
+                
+            } else {
+                alert("Erro ao criar receita");
+            }
+        });
+    </script>
+</body>
+</html>

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models import Recipe, Ingredient
 from models import RecipeCreate, RecipeResponse
-from security import get_db, require_role
+from security import get_current_user, get_db, require_role
 
 router = APIRouter()
 
@@ -11,7 +11,7 @@ router = APIRouter()
 def listar_receitas(db: Session = Depends(get_db)):
     return db.query(Recipe).all()
 
-@router.post("/receitas", response_model=RecipeResponse, dependencies=[Depends(require_role("creator"))])
+@router.post("/post-recipe", response_model=RecipeResponse, dependencies=[Depends(require_role("creator"))])
 def criar_receita(receita: RecipeCreate, db: Session = Depends(get_db)):
     nova_receita = Recipe(
         title=receita.title,

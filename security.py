@@ -59,27 +59,24 @@ def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         role: str = payload.get("role")
-        #print(f"Decoded Token: username={username}, role={role}")
         if username is None or role is None:
             raise credentials_exception
-    except JWTError as e:
-        #print(f"JWT Error: {e}")
+    except JWTError:
         raise credentials_exception
 
     user = db.query(UserDB).filter(UserDB.username == username).first()
     if user is None or user.disabled:
-        print("User not found or disabled")
         raise credentials_exception
 
     user.role = role
     return user
 
-def require_role(required_role: str):
+def require_role(role: str):
     def role_checker(user = Depends(get_current_user)):
-        if user.role != required_role: 
+        if user.role != role:
             raise HTTPException(
-                status_code=403,
-                detail="Access forbidden: insufficient permissions"
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Acesso não autorizado"
             )
         return user
     return role_checker

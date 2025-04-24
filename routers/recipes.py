@@ -35,7 +35,7 @@ def criar_receita(receita: RecipeCreate, db: Session = Depends(get_db)):
     db.refresh(nova_receita)
     return nova_receita
 
-@router.delete("/receitas/{recipe_id}", status_code=204)
+@router.delete("/receitas/{recipe_id}", status_code=204, dependencies=[Depends(require_role("creator"))])
 def delete_receita(recipe_id: int, db: Session = Depends(get_db)):
     # Procurar pela receita com o ID fornecido
     receita = db.query(Recipe).filter(Recipe.id == recipe_id).first()

@@ -78,7 +78,6 @@
                 window.location.reload();
             });
     
-                // Verifica o papel do usuário
             try {
         const response = await fetch("/me", {
             headers: {
@@ -88,7 +87,6 @@
 
         if (response.ok) {
             const user = await response.json();
-            console.log("Usuário logado:", user);
 
             if (user.role === "creator") {
                 postButton.style.display = "block";

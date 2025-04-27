@@ -8,31 +8,17 @@
     <link rel="shortcut icon" href="/static/imgs/imgs/logo.png" type="image/x-icon">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Lobster&display=swap" rel="stylesheet">
-
 </head>
 <body>
     <header>
         <div class="container-fluid d-flex justify-content-between align-items-center px-4">
-            
             <div class="logo-container d-flex flex-wrap align-items-center" style="margin-left: 2%;">
-                <img src="static/imgs/imgs/logo.png" alt="Receita Fácil"
-                     class="logo img-fluid"
-                     style="max-height: 150px; max-width: 100%; height: auto;">
-              
-                <h1 class="site-title ms-3"
-                    style="
-                      font-family: 'Poppins', sans-serif;
-                      color: #333;
-                      font-size: calc(1.2rem + 0.5vw);
-                      margin-left: 10px;
-                      margin-top: 10px;
-                    ">
-                  ReceitaFácil
-                </h1>
-              </div>
+                <img src="static/imgs/imgs/logo.png" alt="Receita Fácil" class="logo img-fluid" style="max-height: 150px; max-width: 100%; height: auto;">
+                <h1 class="site-title ms-3" style="font-family: 'Poppins', sans-serif; color: #333; font-size: calc(1.2rem + 0.5vw); margin-left: 10px; margin-top: 10px;">ReceitaFácil</h1>
+            </div>
 
             <nav class="navbar navbar-expand-lg justify-content-center">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse border-bottom" id="navbarNav">
@@ -52,66 +38,128 @@
 
             <div class="buttons-container" style="margin-right: 5%;">
                 <button id="auth-button" type="button" class="btn btn-secondary btn-sm d-block w-100 mb-2" style="margin-right: 40px"></button>
-                <button id="post-button" class="btn btn-primary btn-sm w-100 mb-2" style="display: none;">Postar Receita</button>
-
+                <button id="post-button" class="btn btn-primary btn-sm w-100 mb-2" style="display: none;" data-bs-toggle="modal" data-bs-target="#postRecipeModal">Postar Receita</button>
             </div>
         </div>
     </header>
+
     <div class="iframe-container" style="display: grid; place-items:center; height: 100%; margin-top: 20px;">
         <iframe src="/receitas-page" width="100%" height="800px" style="border: none" class="d-block mx-auto"></iframe>
     </div>
 
+    <!-- Modal para Postar Receita -->
+    <div class="modal fade" id="postRecipeModal" tabindex="-1" aria-labelledby="postRecipeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="recipe-form">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="postRecipeModalLabel">Postar Receita</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Título:</label>
+                            <input type="text" class="form-control" id="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Descrição:</label>
+                            <textarea class="form-control" id="description" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image_url" class="form-label">URL da Imagem:</label>
+                            <input type="url" class="form-control" id="image_url" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ingredients" class="form-label">Ingredientes (separe por vírgula):</label>
+                            <input type="text" class="form-control" id="ingredients" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Criar Receita</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
-        document.addEventListener("DOMContentLoaded", async function () {
+    document.addEventListener("DOMContentLoaded", async function () {
         const authButton = document.getElementById("auth-button");
         const postButton = document.getElementById("post-button");
-    
+
         const token = localStorage.getItem("token");
-    
+
         if (token) {
             authButton.textContent = "Encerrar Sessão";
             authButton.classList.remove("btn-danger");
             authButton.classList.add("btn-secondary");
-    
+
             authButton.addEventListener("click", function () {
                 localStorage.removeItem("token");
                 window.location.reload();
             });
-    
+
             try {
-        const response = await fetch("/me", {
-            headers: {
-             "Authorization": `Bearer ${token}`
+                const response = await fetch("/me", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const user = await response.json();
+                    if (user.role === "creator") {
+                        postButton.style.display = "block";
+                    }
+                }
+            } catch (error) {
+                console.error("Erro ao verificar o usuário:", error);
             }
-        });
 
-        if (response.ok) {
-            const user = await response.json();
-
-            if (user.role === "creator") {
-                postButton.style.display = "block";
-                postButton.addEventListener("click", function () {
-                window.location.href = "/nova-receita";
-            });
-        }
-    }
-
-        } catch (error) {
-        console.error("Erro ao verificar o usuário:", error);
-    }
-    
         } else {
             authButton.textContent = "Acessar Conta";
             authButton.classList.remove("btn-secondary");
             authButton.classList.add("btn-danger");
-    
+
             authButton.addEventListener("click", function () {
                 window.location.href = "/auth";
             });
+        }
+
+        document.getElementById("recipe-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const title = document.getElementById("title").value;
+            const description = document.getElementById("description").value;
+            const image_url = document.getElementById("image_url").value;
+            const ingredients = document.getElementById("ingredients").value.split(',');
+
+            try {
+                const response = await fetch("/post-recipe", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ title, description, image_url, ingredients })
+                });
+
+                if (response.ok) {
+                    alert("Receita criada com sucesso!");
+                    document.getElementById("recipe-form").reset();
+                    const iframe = document.querySelector('iframe');
+                    iframe.src = iframe.src; // Reload iframe para atualizar receitas
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('postRecipeModal'));
+                    modal.hide();
+                } else {
+                    alert("Erro ao criar receita");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Erro de rede ao criar receita");
             }
         });
+    });
     </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

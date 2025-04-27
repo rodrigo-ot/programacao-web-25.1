@@ -69,26 +69,26 @@
 
     <script>
         async function verificarUsuario() {
-        const token = localStorage.getItem('token');
-        
-        if (token) {
-            try {
-                const response = await fetch('/me', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+            const token = localStorage.getItem('token');
+            
+            if (token) {
+                try {
+                    const response = await fetch('/me', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
 
-                if (response.ok) {
-                    const user = await response.json();
-                    return { auth: true, role: user.role };
+                    if (response.ok) {
+                        const user = await response.json();
+                        return { auth: true, role: user.role };
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar dados do usuário:', error);
                 }
-            } catch (error) {
-                console.error('Erro ao buscar dados do usuário:', error);
             }
+            return { auth: false, role: null };
         }
-        return { auth: false, role: null };
-    }
 
         async function carregarReceitas(userAuth, userRole) {
             document.getElementById('loading').style.display = 'block'; 
@@ -105,7 +105,7 @@
 
                 div.innerHTML = `
                     <div class="card h-100">
-                        ${receita.image_url ?
+                        ${receita.image_url ? 
                             `<img src="${receita.image_url}" class="card-img-top img-fluid" style="height: 240px; object-fit: cover;" alt="${receita.title}">` :
                             `<div class="card-img-top" style="height: 200px; background-color: #f0f0f0;"></div>`
                         }
@@ -129,6 +129,17 @@
                 container.appendChild(div);
             });
         }
+
+        function filtrarReceitas() {
+        const query = document.getElementById('searchBar').value.toLowerCase();
+        const receitasFiltradas = todasReceitas.filter(receita =>
+            receita.title.toLowerCase().includes(query)
+        );
+
+        // Exibe as receitas filtradas
+        exibirReceitas(receitasFiltradas, 'creator'); // O segundo parâmetro pode ser alterado conforme o papel do usuário
+        }
+
         function abrirModal(titulo, descricao) {
             const modalTitle = document.getElementById('preparoModalLabel');
             const modalBody = document.getElementById('preparoModalBody');
@@ -180,31 +191,33 @@
         }
 
         document.getElementById('confirmarDeleteBtn').addEventListener('click', async () => {
-            try {
-                const response = await fetch(`/receitas/${receitaId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-
-                if (response.ok) {
-                    const ModalElement = document.getElementById('modalConfirmDelete');
-                    const modalInstance = bootstrap.Modal.getInstance(ModalElement);
-                    modalInstance.hide();
-
-                    const toast = new bootstrap.Toast(document.getElementById('toastSucesso'));
-                    toast.show();
-
-                    carregarReceitas();
-                } else {
-                    alert('Erro ao excluir a receita.');
-                }
-            } catch (err) {
-                console.error('Erro na exclusão:', err);
-                alert('Erro inesperado.');
+    try {
+        const response = await fetch(`/receitas/${receitaId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         });
+
+        if (response.ok) {
+            const ModalElement = document.getElementById('modalConfirmDelete');
+            const modalInstance = bootstrap.Modal.getInstance(ModalElement);
+            modalInstance.hide();
+
+            const toast = new bootstrap.Toast(document.getElementById('toastSucesso'));
+            toast.show();
+
+            // Carregar as receitas novamente após a exclusão
+            const { auth, role } = await verificarUsuario();
+            carregarReceitas(auth, role); // Garantindo que os botões sejam recriados
+        } else {
+            alert('Erro ao excluir a receita.');
+        }
+    } catch (err) {
+        console.error('Erro na exclusão:', err);
+        alert('Erro inesperado.');
+    }
+});
 
         (async () => {
             const { auth, role } = await verificarUsuario();

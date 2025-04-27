@@ -7,8 +7,7 @@
 </head>
 <body>
     <h1>Postar Receita</h1>
-    
-    <!-- Formulário para criar uma receita -->
+
     <form id="recipe-form">
         <label for="title">Título:</label><br>
         <input type="text" id="title" name="title" required><br><br>
@@ -22,37 +21,7 @@
     </form>
 
     <script>
-    window.onload = async function () {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            alert("Você precisa estar logado.");
-            window.location.href = "/auth";
-            return;
-        }
-
-        try {
-            const response = await fetch("/me", {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error("Token inválido");
-            }
-
-            const user = await response.json();
-            if (user.role !== "creator") {
-                alert("Acesso negado. Sua conta não deve criar receitas.");
-                window.location.href = "/home";
-            }
-
-        } catch (err) {
-            console.error(err);
-            alert("Apenas Criadores podem postar receitas.");
-            window.location.href = "/auth";
-        }
-    };
+    
 
     document.getElementById("recipe-form").addEventListener("submit", async function(event) {
             event.preventDefault();

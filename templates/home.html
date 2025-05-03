@@ -47,7 +47,6 @@
         <iframe src="/receitas-page" width="100%" height="800px" style="border: none" class="d-block mx-auto"></iframe>
     </div>
 
-    <!-- Modal para Postar Receita -->
     <div class="modal fade" id="postRecipeModal" tabindex="-1" aria-labelledby="postRecipeModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -146,7 +145,7 @@
                     alert("Receita criada com sucesso!");
                     document.getElementById("recipe-form").reset();
                     const iframe = document.querySelector('iframe');
-                    iframe.src = iframe.src; // Reload iframe para atualizar receitas
+                    iframe.src = iframe.src; 
                     const modal = bootstrap.Modal.getInstance(document.getElementById('postRecipeModal'));
                     modal.hide();
                 } else {

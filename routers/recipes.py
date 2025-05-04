@@ -19,14 +19,13 @@ def criar_receita(receita: RecipeCreate, db: Session = Depends(get_db)):
         image_url=receita.image_url
     )
 
-    # Processar ingredientes
     ingredientes = []
     for nome in receita.ingredients:
         ingrediente = db.query(Ingredient).filter(Ingredient.name == nome).first()
         if not ingrediente:
             ingrediente = Ingredient(name=nome)
             db.add(ingrediente)
-            db.flush()  # para obter o ID antes do commit
+            db.flush() 
         ingredientes.append(ingrediente)
 
     nova_receita.ingredients = ingredientes
@@ -37,14 +36,39 @@ def criar_receita(receita: RecipeCreate, db: Session = Depends(get_db)):
 
 @router.delete("/receitas/{recipe_id}", status_code=204, dependencies=[Depends(require_role("creator"))])
 def delete_receita(recipe_id: int, db: Session = Depends(get_db)):
-    # Procurar pela receita com o ID fornecido
     receita = db.query(Recipe).filter(Recipe.id == recipe_id).first()
 
-    # Se a receita não for encontrada, lançar uma exceção
     if not receita:
         raise HTTPException(status_code=404, detail="Receita não encontrada")
 
-    # Deletar a receita
     db.delete(receita)
     db.commit()
     return {"message": "Receita excluída com sucesso"}
+
+
+@router.put("/receitas/{recipe_id}", response_model=RecipeResponse, dependencies=[Depends(require_role("creator"))])
+def editar_receita(recipe_id: int, receita: RecipeCreate, db: Session = Depends(get_db)):
+    receita_existente = db.query(Recipe).filter(Recipe.id == recipe_id).first()
+
+    if not receita_existente:
+        raise HTTPException(status_code=404, detail="Receita não encontrada")
+
+    receita_existente.title = receita.title
+    receita_existente.description = receita.description
+    receita_existente.image_url = receita.image_url
+
+    ingredientes = []
+    for nome in receita.ingredients:
+        ingrediente = db.query(Ingredient).filter(Ingredient.name == nome).first()
+        if not ingrediente:
+            ingrediente = Ingredient(name=nome)
+            db.add(ingrediente)
+            db.flush() 
+        ingredientes.append(ingrediente)
+
+    receita_existente.ingredients = ingredientes
+
+    db.commit()
+    db.refresh(receita_existente)
+
+    return receita_existente

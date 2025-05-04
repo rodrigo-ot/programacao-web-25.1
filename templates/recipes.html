@@ -69,6 +69,42 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalEditarReceita" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Editar Receita</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+              <form id="formEditarReceita">
+                <input type="hidden" id="editarId">
+                <div class="mb-3">
+                  <label for="editarTitulo" class="form-label">Título</label>
+                  <input type="text" class="form-control" id="editarTitulo" required>
+                </div>
+                <div class="mb-3">
+                  <label for="editarIngredientes" class="form-label">Ingredientes (separados por vírgula)</label>
+                  <input type="text" class="form-control" id="editarIngredientes" required>
+                </div>
+                <div class="mb-3">
+                  <label for="editarDescricao" class="form-label">Descrição</label>
+                  <textarea class="form-control" id="editarDescricao" rows="5" required></textarea>
+                </div>
+                <div class="mb-3">
+                  <label for="editarImagem" class="form-label">URL da Imagem</label>
+                  <input type="url" class="form-control" id="editarImagem">
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="button" class="btn btn-primary" onclick="handleSalvarAlteracoes()">Salvar Alterações</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     <script>
         async function verificarUsuario() {
             const token = localStorage.getItem('token');
@@ -95,13 +131,16 @@
         let todasReceitas = [];
 
         async function carregarReceitas(userAuth, userRole) {
-        document.getElementById('loading').style.display = 'block'; 
-        const response = await fetch('/receitas');
-        todasReceitas = await response.json(); // Salva todas as receitas para filtro posterior
-        document.getElementById('loading').style.display = 'none';
+    document.getElementById('loading').style.display = 'block'; 
+    const response = await fetch('/receitas');
+    todasReceitas = await response.json(); // Salva todas as receitas para filtro posterior
+    document.getElementById('loading').style.display = 'none';
 
-        exibirReceitas(todasReceitas, userRole);
-        }
+    // Ordena as receitas pelo campo `id` (ou outro campo consistente)
+    todasReceitas.sort((a, b) => a.id - b.id);
+
+    exibirReceitas(todasReceitas, userRole);
+}
 
         function filtrarReceitas() {
         const query = document.getElementById('searchBar').value.toLowerCase();
@@ -140,12 +179,20 @@
                                     onclick="confirmarExclusao(${receita.id}, '${receita.title.replace(/'/g, "\\'")}')">
                                     Remover
                                 </button>` : ''}
+                            ${userRole === "creator" ? `
+                                <button class="btn btn-lg" type="button"
+                                    onclick="editarReceita(${receita.id})">
+                                    <i class="bi bi-tools"></i> ⚙️
+                                </button>` : ''}
                         </div>
                     </div>
                 </div>
+                
             `;
             container.appendChild(div);
             });
+
+            
         }
 
         function filtrarReceitas() {
@@ -154,8 +201,7 @@
             receita.title.toLowerCase().includes(query)
         );
 
-        // Exibe as receitas filtradas
-        exibirReceitas(receitasFiltradas, 'creator'); // O segundo parâmetro pode ser alterado conforme o papel do usuário
+        exibirReceitas(receitasFiltradas, 'creator'); 
         }
 
         function abrirModal(titulo, descricao) {
@@ -209,38 +255,93 @@
         }
 
         document.getElementById('confirmarDeleteBtn').addEventListener('click', async () => {
-    try {
-        const response = await fetch(`/receitas/${receitaId}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            try {
+                const response = await fetch(`/receitas/${receitaId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.ok) {
+                    const ModalElement = document.getElementById('modalConfirmDelete');
+                    const modalInstance = bootstrap.Modal.getInstance(ModalElement);
+                    modalInstance.hide();
+
+                    const toast = new bootstrap.Toast(document.getElementById('toastSucesso'));
+                    toast.show();
+
+                    // Carregar as receitas novamente após a exclusão
+                    const { auth, role } = await verificarUsuario();
+                    carregarReceitas(auth, role); // Garantindo que os botões sejam recriados
+                } else {
+                    alert('Erro ao excluir a receita.');
+                }
+            } catch (err) {
+                console.error('Erro na exclusão:', err);
+                alert('Erro inesperado.');
             }
         });
-
-        if (response.ok) {
-            const ModalElement = document.getElementById('modalConfirmDelete');
-            const modalInstance = bootstrap.Modal.getInstance(ModalElement);
-            modalInstance.hide();
-
-            const toast = new bootstrap.Toast(document.getElementById('toastSucesso'));
-            toast.show();
-
-            // Carregar as receitas novamente após a exclusão
-            const { auth, role } = await verificarUsuario();
-            carregarReceitas(auth, role); // Garantindo que os botões sejam recriados
-        } else {
-            alert('Erro ao excluir a receita.');
-        }
-    } catch (err) {
-        console.error('Erro na exclusão:', err);
-        alert('Erro inesperado.');
-    }
-});
 
         (async () => {
             const { auth, role } = await verificarUsuario();
             carregarReceitas(auth, role);
         })();
+
+
+        let receitaEditando = null;
+
+        function editarReceita(id) {
+            const receita = todasReceitas.find(r => r.id === id);
+            if (!receita) return alert("Receita não encontrada.");
+
+            document.getElementById('editarId').value = receita.id;
+            document.getElementById('editarTitulo').value = receita.title;
+            document.getElementById('editarIngredientes').value = receita.ingredients.map(i => i.name).join(', ');
+            document.getElementById('editarDescricao').value = receita.description;
+            document.getElementById('editarImagem').value = receita.image_url || '';
+
+            const modal = new bootstrap.Modal(document.getElementById('modalEditarReceita'));
+            modal.show();
+        }
+
+    async function handleSalvarAlteracoes() {
+        const id = document.getElementById('editarId').value;
+        const titulo = document.getElementById('editarTitulo').value.trim();
+        const ingredientes = document.getElementById('editarIngredientes').value.split(',').map(i => i.trim());
+        const descricao = document.getElementById('editarDescricao').value.trim();
+        const imagem = document.getElementById('editarImagem').value.trim();
+
+        try {
+            const response = await fetch(`/receitas/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({
+                    title: titulo,
+                    ingredients: ingredientes,
+                    description: descricao,
+                    image_url: imagem
+                })
+            });
+
+            if (!response.ok) {
+                const erro = await response.json();
+                console.error("Erro na atualização:", erro);
+                return alert("Erro ao atualizar receita.");
+            }
+
+            bootstrap.Modal.getInstance(document.getElementById('modalEditarReceita')).hide();
+            const { auth, role } = await verificarUsuario();
+            carregarReceitas(auth, role);
+
+        } catch (err) {
+            console.error("Erro inesperado:", err);
+            alert("Erro inesperado ao atualizar.");
+        }
+    }
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -19,7 +19,7 @@
       
     <h1 class="text-center my-4">Receitas postadas</h1>
     <div class="container mb-4 w-50">
-        <input type="text" id="searchBar" class="form-control" placeholder="Pesquisar receitas..." oninput="filtrarReceitas()"/></div>
+        <input type="text" id="searchBar" class="form-control" placeholder="Informe seus ingredientes (separe por vírgula)" oninput="filtrarReceitas()"/></div>
     <div id="receitas" class="container mx-auto row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4" style="max-width: 1200px;"></div>
 
     <div id="loading" class="text-center my-5" style="display: none;">
@@ -142,15 +142,25 @@
     exibirReceitas(todasReceitas, userRole);
 }
 
-        function filtrarReceitas() {
+    function filtrarReceitas() {
         const query = document.getElementById('searchBar').value.toLowerCase();
-        const receitasFiltradas = todasReceitas.filter(receita =>
-            receita.title.toLowerCase().includes(query)
-        );
+        
+        const termos = query.split(',').map(term => term.trim()).filter(term => term !== '');
 
-        // Exibe as receitas filtradas
-        exibirReceitas(receitasFiltradas, 'creator'); // O segundo parâmetro pode ser alterado conforme o papel do usuário
-        }
+        const receitasFiltradas = todasReceitas.filter(receita => {
+            const tituloMatch = receita.title.toLowerCase().includes(query);
+
+            const ingredientes = receita.ingredients.map(ing => ing.name.toLowerCase());
+
+            const ingredientesMatch = termos.every(term => 
+                ingredientes.some(ing => ing.includes(term))
+            );
+
+            return tituloMatch || ingredientesMatch;
+        });
+
+        exibirReceitas(receitasFiltradas);
+    }
 
         function exibirReceitas(receitas, userRole) {
         const container = document.getElementById('receitas');
@@ -193,15 +203,6 @@
             });
 
             
-        }
-
-        function filtrarReceitas() {
-        const query = document.getElementById('searchBar').value.toLowerCase();
-        const receitasFiltradas = todasReceitas.filter(receita =>
-            receita.title.toLowerCase().includes(query)
-        );
-
-        exibirReceitas(receitasFiltradas, 'creator'); 
         }
 
         function abrirModal(titulo, descricao) {

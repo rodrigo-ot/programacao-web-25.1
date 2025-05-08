@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Table
 from datetime import datetime
 from sqlalchemy.orm import relationship
@@ -90,3 +90,11 @@ class RecipeResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+class PasswordReset(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str

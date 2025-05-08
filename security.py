@@ -80,3 +80,9 @@ def require_role(role: str):
             )
         return user
     return role_checker
+
+
+def create_password_reset_token(email: str, expires_delta: timedelta = timedelta(hours=1)):
+    to_encode = {"sub": email, "exp": datetime.utcnow() + expires_delta}
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+

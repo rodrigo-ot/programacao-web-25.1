@@ -81,9 +81,6 @@ def receitas_page(request: Request):
 async def auth_status(user: User = Depends(get_current_user)):
     return {"is_authenticated": True}
 
-# @router.get("/nova-receita", response_class=HTMLResponse)
-# def nova_receita_page(request: Request):
-#     return templates.TemplateResponse("post_recipe.html", {"request": request})
 
 @router.get("/me")
 def get_user_info(user = Depends(get_current_user)):
@@ -93,3 +90,7 @@ def get_user_info(user = Depends(get_current_user)):
     }
 
 app.include_router(router)
+
+@auth_router.get("/reset-password", response_class=HTMLResponse)
+def show_reset_form(request: Request, token: str):
+    return templates.TemplateResponse("reset_password_form.html", {"request": request, "token": token})

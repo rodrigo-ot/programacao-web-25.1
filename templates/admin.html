@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Tela de criação</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo</title>
 </head>
 <body>
-    <h1>Criar Receita</h1>
-    <p>teste</p>
+<h1>Painel Administrativo</h1>
+<p>Bem-vindo, {{ request.state.current_user.username }}!</p>
+<h2>Minhas Receitas</h2>
+<ul>
+    {% for recipe in recipes %}
+    <li>{{ recipe.title }} - <a href="/recipes/{{ recipe.id }}">Ver Receita</a></li>
+    {% endfor %}
+</ul>
 </body>
 </html>

@@ -7,123 +7,160 @@
     <link rel="stylesheet" type="text/css" href="/static/css/home.css">
     <link rel="shortcut icon" href="/static/imgs/imgs/logo.png" type="image/x-icon">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Lobster&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <div class="container-fluid d-flex justify-content-between align-items-center px-4">
-            <div class="logo-container" style=" margin-left: 2%;">
-                <img src="static\imgs\imgs\logo.png" alt="Receita Fácil" class="logo img-fluid" style="max-height: 150px;">
+    <header class="bg-light border-bottom shadow-sm py-3">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+          
+          <div class="d-flex align-items-center">
+            <img src="static/imgs/imgs/logo.png" alt="Receita Fácil" class="img-fluid" style="max-height: 70px;">
+            <h1 class="ms-3 mb-0 fs-4 fw-semibold text-dark" style="font-family: 'Poppins', sans-serif;">ReceitaFácil</h1>
+          </div>
+      
+          <nav class="navbar navbar-expand-lg">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+      
+            <div class="collapse navbar-collapse" id="navbarNav">
+              <ul class="navbar-nav gap-2">
+                <li class="nav-item">
+                  <a class="nav-link fw-medium text-dark" href="#">Início</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link fw-medium text-dark" href="#">Sobre</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link fw-medium text-dark" href="#">Contato</a>
+                </li>
+              </ul>
             </div>
+          </nav>
 
-            <nav class="navbar navbar-expand-lg">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse border-bottom" id="navbarNav">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a href="#" class="nav-link text-dark">Início</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link text-dark">Sobre</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link text-dark">Contato</a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-
-            <div class="buttons-container" style="margin-right: 5%;">
+            <div class="buttons-container" style="margin-right: 1%;">
                 <button id="auth-button" type="button" class="btn btn-secondary btn-sm d-block w-100 mb-2" style="margin-right: 40px"></button>
+                <button id="post-button" class="btn btn-primary btn-sm w-100 mb-2" style="display: none;" data-bs-toggle="modal" data-bs-target="#postRecipeModal">Postar Receita</button>
             </div>
-            <button class="btn btn-primary" onclick="createRecipeModel()">Publicar Receita</button>
-
         </div>
     </header>
 
-    <div class="modal fade" id="RecipeModal" tabindex="-1" aria-labelledby="adminModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="adminModalLabel">Compartilhe sua receita ☕🍪📜</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+    <div class="iframe-container" style="display: grid; place-items:center; height: 100%; margin-top: 20px;">
+        <iframe src="/receitas-page" width="100%" height="800px" style="border: none" class="d-block mx-auto"></iframe>
+    </div>
+
+    <div class="modal fade" id="postRecipeModal" tabindex="-1" aria-labelledby="postRecipeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="recipe-form">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="postRecipeModalLabel">Postar Receita</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Título:</label>
+                            <input type="text" class="form-control" id="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Descrição:</label>
+                            <textarea class="form-control" id="description" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image_url" class="form-label">URL da Imagem:</label>
+                            <input type="url" class="form-control" id="image_url" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ingredients" class="form-label">Ingredientes (separe por vírgula):</label>
+                            <input type="text" class="form-control" id="ingredients" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Criar Receita</button>
+                    </div>
+                </form>
             </div>
-            <div class="modal-body" id="modalBody">
-              
-            </div>
-          </div>
         </div>
-      </div>
-      
+    </div>
 
-   <script>
+    <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+        const authButton = document.getElementById("auth-button");
+        const postButton = document.getElementById("post-button");
 
-function createRecipeModel() {
-    const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
 
-    fetch("http://127.0.0.1:8001/admin-page", {
-        method: "GET",
-        mode: "cors",
-        headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-        }
-    })
-    .then(res => {
-        if (res.ok) {
-            return res.text();
+        if (token) {
+            authButton.textContent = "Encerrar Sessão";
+            authButton.classList.remove("btn-danger");
+            authButton.classList.add("btn-secondary");
+
+            authButton.addEventListener("click", function () {
+                localStorage.removeItem("token");
+                window.location.reload();
+            });
+
+            try {
+                const response = await fetch("/me", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+
+                if (response.ok) {
+                    const user = await response.json();
+                    if (user.role === "creator") {
+                        postButton.style.display = "block";
+                    }
+                }
+            } catch (error) {
+                console.error("Erro ao verificar o usuário:", error);
+            }
+
         } else {
-            throw new Error("Acesso negado");
+            authButton.textContent = "Acessar Conta";
+            authButton.classList.remove("btn-secondary");
+            authButton.classList.add("btn-danger");
+
+            authButton.addEventListener("click", function () {
+                window.location.href = "/auth";
+            });
         }
-    })
-    .then(html => {
-        document.getElementById("modalBody").innerHTML = html;
 
-        const modal = new bootstrap.Modal(document.getElementById("RecipeModal"));
-        modal.show();
-    })
-    .catch(err => {
-        alert(err.message);
+        document.getElementById("recipe-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const title = document.getElementById("title").value;
+            const description = document.getElementById("description").value;
+            const image_url = document.getElementById("image_url").value;
+            const ingredients = document.getElementById("ingredients").value.split(',');
+
+            try {
+                const response = await fetch("/post-recipe", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ title, description, image_url, ingredients })
+                });
+
+                if (response.ok) {
+                    alert("Receita criada com sucesso!");
+                    document.getElementById("recipe-form").reset();
+                    const iframe = document.querySelector('iframe');
+                    iframe.src = iframe.src; 
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('postRecipeModal'));
+                    modal.hide();
+                } else {
+                    alert("Erro ao criar receita");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Erro de rede ao criar receita");
+            }
+        });
     });
-}
+    </script>
 
-function closeModal() {
-    const modal = document.getElementById("RecipeModal");
-    modal.style.display = "none";
-
-    document.body.classList.remove("blurred");
-
-    document.getElementById("modalBody").innerHTML = "";
-}
-
-    document.addEventListener("DOMContentLoaded", function () {
-    const authButton = document.getElementById("auth-button");
-    const token = localStorage.getItem("token");
-
-    if (token) {
-        authButton.textContent = "Encerrar Sessão";
-        authButton.classList.remove("btn-danger");
-        authButton.classList.add("btn-secondary");
-
-        authButton.addEventListener("click", function () {
-            localStorage.removeItem("token"); 
-            window.location.reload(); 
-        });
-    } else {
-        authButton.textContent = "Acessar Conta";
-        authButton.classList.remove("btn-secondary");
-        authButton.classList.add("btn-danger");
-
-        authButton.addEventListener("click", function () {
-            window.location.href = "/auth"; 
-        });
-    }
-});
-   </script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-

@@ -1,75 +1,65 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!-- <!DOCTYPE html>
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Postar Receita</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="container mt-4">
-<h2 class="mb-4">Postar Receita</h2>
-<form id="recipeForm" class="needs-validation" novalidate>
-    <div class="mb-3">
-        <label for="title" class="form-label">Título:</label>
-        <input type="text" id="title" name="title" class="form-control" required>
-    </div>
+<body>
+    <h1>Postar Receita</h1>
 
-    <div class="mb-3">
-        <label for="ingredients" class="form-label">Ingredientes:</label>
-        <textarea id="ingredients" name="ingredients" class="form-control" required></textarea>
-    </div>
+    <form id="recipe-form">
+        <label for="title">Título:</label><br>
+        <input type="text" id="title" name="title" required><br><br>
+        <label for="description">Descrição:</label><br>
+        <textarea id="description" name="description" required></textarea><br><br>
+        <label for="image_url">URL da Imagem:</label><br>
+        <input type="url" id="image_url" name="image_url" required><br><br>
+        <label for="ingredients">Ingredientes (separe por vírgula):</label><br>
+        <input type="text" id="ingredients" name="ingredients" required><br><br>
+        <button type="submit">Criar Receita</button>
+    </form>
 
-    <div class="mb-3">
-        <label for="preparation" class="form-label">Modo de Preparo:</label>
-        <textarea id="preparation" name="preparation" class="form-control" required></textarea>
-    </div>
+    <script>
+    
 
-    <div class="mb-3">
-        <label for="time" class="form-label">Tempo de Preparo (minutos):</label>
-        <input type="number" id="time" name="time" class="form-control" required>
-    </div>
+    document.getElementById("recipe-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
 
-    <div class="mb-3">
-        <label for="image" class="form-label">Imagem:</label>
-        <input type="file" id="image" name="image" class="form-control" accept="image/*">
-    </div>
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("Você precisa estar logado.");
+                window.location.href = "/login";
+                return;
+            }
 
-    <button type="submit" class="btn btn-primary">Enviar Receita</button>
-</form>
+            const title = document.getElementById("title").value;
+            const description = document.getElementById("description").value;
+            const image_url = document.getElementById("image_url").value;
+            const ingredients = document.getElementById("ingredients").value.split(',');
 
-<script>
-    document.getElementById("recipeForm").addEventListener("submit", async function(event) {
-        event.preventDefault();
-
-        const formData = new FormData();
-        formData.append("title", document.getElementById("title").value);
-        formData.append("ingredients", document.getElementById("ingredients").value);
-        formData.append("preparation", document.getElementById("preparation").value);
-        formData.append("time", document.getElementById("time").value);
-        const imageFile = document.getElementById("image").files[0];
-        if (imageFile) {
-            formData.append("image", imageFile);
-        }
-
-        try {
-            const response = await fetch("http://localhost:8000/receitas", {
+            const response = await fetch("/post-recipe", {
                 method: "POST",
-                body: formData
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`  
+                },
+                body: JSON.stringify({
+                    title: title,
+                    description: description,
+                    image_url: image_url,
+                    ingredients: ingredients
+                })
             });
 
             if (response.ok) {
-                alert("Receita enviada para moderação!");
-                document.getElementById("recipeForm").reset();
+                const newRecipe = await response.json();
+                alert("Receita criada com sucesso!");
+                
             } else {
-                alert("Erro ao enviar receita!");
+                alert("Erro ao criar receita");
             }
-        } catch (error) {
-            console.error("Erro:", error);
-            alert("Erro ao conectar com o servidor.");
-        }
-    });
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        });
+    </script>
 </body>
-</html>
+</html> -->

@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from routers.auth_routes import auth_router
 from security import get_current_user, require_role
-from models import Recipe, User, UserDB 
+from models import Comentario, Recipe, User, UserDB 
 from pydantic import BaseModel
 from typing import List, Annotated
 from database import SessionLocal, engine
@@ -16,6 +16,7 @@ from routers import recipes
 app = FastAPI()
 app.include_router(recipes.router)
 router = APIRouter()
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -90,6 +91,3 @@ def get_user_info(user = Depends(get_current_user)):
 
 app.include_router(router)
 
-@auth_router.get("/reset-password", response_class=HTMLResponse)
-def show_reset_form(request: Request, token: str):
-    return templates.TemplateResponse("reset_password_form.html", {"request": request, "token": token})

@@ -1,6 +1,6 @@
 from typing import List, Optional
 from pydantic import BaseModel, EmailStr
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Table
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, DateTime, Table, Text
 from datetime import datetime
 from sqlalchemy.orm import relationship
 from database import Base
@@ -59,14 +59,19 @@ class Recipe(Base):
     image_url = Column(String, nullable=True)
 
     ingredients = relationship("Ingredient", secondary="recipe_ingredients", backref="recipes")
+    comentarios = relationship("Comentario", back_populates="recipe", cascade="all, delete-orphan")
 
 class Comentario(Base):
     __tablename__ = "comentarios"
     id = Column(Integer, primary_key=True)
-    author_id = Column(Integer)
-    text = Column(String)
-    star = Column(Integer)
+    author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    text = Column(String, nullable=False)
+    star = Column(Integer, nullable=True)  
+    
 
+    recipe_id = Column(Integer, ForeignKey("recipes.id"), nullable=False)
+    recipe = relationship("Recipe", back_populates="comentarios")
+    author = relationship("UserDB")
 
 recipe_ingredients = Table(
     "recipe_ingredients",
@@ -107,8 +112,17 @@ class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str
 
-class Comentario(BaseModel):
-    id: int
-    author_id: int
+
+class ComentarioCreate(BaseModel):
     text: str
-    star: int
+    star: int | None = None  
+
+class ComentarioResponse(BaseModel):
+    id: int
+    text: str
+    star: int | None = None
+    author_id: int
+    recipe_id: int
+
+
+

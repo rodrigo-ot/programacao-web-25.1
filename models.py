@@ -60,6 +60,14 @@ class Recipe(Base):
 
     ingredients = relationship("Ingredient", secondary="recipe_ingredients", backref="recipes")
 
+class Comentario(Base):
+    __tablename__ = "comentarios"
+    id = Column(Integer, primary_key=True)
+    author_id = Column(Integer)
+    text = Column(String)
+    star = Column(Integer)
+
+
 recipe_ingredients = Table(
     "recipe_ingredients",
     Base.metadata,
@@ -98,3 +106,9 @@ class PasswordReset(BaseModel):
 class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str
+
+class Comentario(BaseModel):
+    id: int
+    author_id: int
+    text: str
+    star: int

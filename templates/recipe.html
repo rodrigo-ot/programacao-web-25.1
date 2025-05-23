@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>{{ receita.title }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Lobster&display=swap" rel="stylesheet">
 </head>
 <body class="bg-light">
 
@@ -66,12 +68,64 @@
                         </ul>
 
                         <a href="/home" class="btn btn-outline-primary mt-4">Voltar</a>
+                        <!-- <button id ="post-comment">aaaa</button> -->
+                        <button id="post-comment" class="btn btn-outline-primary mt-4" data-bs-toggle="modal" data-bs-target="#postCommentModal">Postar Comentário</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+<div class="modal fade" id="postCommentModal" tabindex="-1" aria-labelledby="postCommentModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="comment-form">
+        <div class="modal-header">
+          <h5 class="modal-title" id="postComentario">Postar Comentário</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
 
+          <!-- Comentário -->
+          <div class="mb-3">
+            <label for="description" class="form-label">Comentário:</label>
+            <textarea class="form-control" id="description" rows="3" required></textarea>
+          </div>
+
+          <!-- URL da Imagem -->
+          <div class="mb-3">
+            <label for="image_url" class="form-label">URL da Imagem:</label>
+            <input type="url" class="form-control" id="image_url" required>
+          </div>
+
+          <!-- Avaliação por Estrelas -->
+          <div class="mb-3">
+            <label class="form-label d-block">Avaliação:</label>
+            <div class="rating" style="display: flex; justify-content: center;">
+              <input type="radio" name="star" id="star1" value="1" style="display: none;">
+              <label for="star1" class="fa fa-star" style="font-size: 24px; color: #ccc; cursor: pointer;"></label>
+
+              <input type="radio" name="star" id="star2" value="2" style="display: none;">
+              <label for="star2" class="fa fa-star" style="font-size: 24px; color: #ccc; cursor: pointer;"></label>
+
+              <input type="radio" name="star" id="star3" value="3" style="display: none;">
+              <label for="star3" class="fa fa-star" style="font-size: 24px; color: #ccc; cursor: pointer;"></label>
+
+              <input type="radio" name="star" id="star4" value="4" style="display: none;">
+              <label for="star4" class="fa fa-star" style="font-size: 24px; color: #ccc; cursor: pointer;"></label>
+
+              <input type="radio" name="star" id="star5" value="5" style="display: none;">
+              <label for="star5" class="fa fa-star" style="font-size: 24px; color: #ccc; cursor: pointer;"></label>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Postar Comentário</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 <script>
@@ -114,6 +168,77 @@
             });
         }
     });
+    const postComment = document.getElementById("post-comment");
+    document.getElementById("comment-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const description = document.getElementById("description").value;
+            
+            try {
+                const response = await fetch("/post-recipe", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({description})
+                });
+
+                if (response.ok) {
+                    document.getElementById("comment-form").reset();
+                    const iframe = document.querySelector('iframe');
+                    iframe.src = iframe.src; 
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('postCommentModal'));
+                    modal.hide();
+                } else {
+                    alert("Erro ao criar receita");
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        });
 </script>
+
+<style>
+.rating label:before {
+  content: '\f005';
+  font-family: fontAwesome;
+  position: relative;
+  display: block;
+  font-size: 32px;
+  color: #0e1316;
+}
+.rating label:after {
+  content: '\f005';
+  font-family: fontAwesome;
+  position: absolute;
+  display: block;
+  font-size: 32px;
+  color: #ffff00;
+  top: 0;
+  opacity: 0;
+  transition: .5s;
+  text-shadow: 0 4px 5px rgba(0, 0, 0, .5);
+}
+.rating label:hover:after,
+.rating label:hover ~ label:after,
+.rating input:checked ~ label:after {
+  opacity: 1;
+}
+.rating {
+  direction: rtl;
+  display: flex;
+  gap: 2px;
+  justify-content: flex-start;
+}
+.rating input {
+  display: none;
+}
+.rating label {
+  cursor: pointer;
+  width: 32px;
+  position: relative;
+}
+</style>
 
 </html>

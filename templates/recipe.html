@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ receita.title }}</title>
+</head>
+<body>
+    <h1>{{ receita.title }}</h1>
+
+    <img src="{{ receita.image_url }}" alt="Imagem da Receita" width="400">
+
+    <h2>Descrição</h2>
+    <p>{{ receita.description | replace("\n", "<br>") | safe }}</p>
+
+    <h2>Ingredientes</h2>
+    <ul>
+        {% for ingrediente in receita.ingredients %}
+            <li>{{ ingrediente.name }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

@@ -1,15 +1,42 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 from models import Recipe, Ingredient
 from models import RecipeCreate, RecipeResponse
 from security import get_current_user, get_db, require_role
 
 router = APIRouter()
+templates = Jinja2Templates(directory="templates")
 
 @router.get("/receitas", response_model=List[RecipeResponse])
 def listar_receitas(db: Session = Depends(get_db)):
     return db.query(Recipe).all()
+
+@router.get("/receitas/{recipe_id}", response_model=RecipeResponse)
+def obter_receita(recipe_id: int, db: Session = Depends(get_db)):
+    receita = db.query(Recipe).filter(Recipe.id == recipe_id).first()
+
+    if not receita:
+        raise HTTPException(status_code=404, detail="Receita não encontrada")
+
+    return receita
+
+@router.get("/receitas/{recipe_id}/page", response_class=HTMLResponse)
+def pagina_receita(recipe_id: int, request: Request, db: Session = Depends(get_db)):
+    receita = db.query(Recipe).filter(Recipe.id == recipe_id).first()
+
+    if not receita:
+        raise HTTPException(status_code=404, detail="Receita não encontrada")
+
+    return templates.TemplateResponse(
+        "recipe.html", 
+        {
+            "request": request,
+            "receita": receita
+        }
+    )
 
 @router.post("/post-recipe", response_model=RecipeResponse, dependencies=[Depends(require_role("creator"))])
 def criar_receita(receita: RecipeCreate, db: Session = Depends(get_db)):

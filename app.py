@@ -81,7 +81,6 @@ def receitas_page(request: Request):
 async def auth_status(user: User = Depends(get_current_user)):
     return {"is_authenticated": True}
 
-
 @router.get("/me")
 def get_user_info(user = Depends(get_current_user)):
     return {

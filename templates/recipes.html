@@ -180,10 +180,12 @@
                         <h5 class="card-title">${receita.title}</h5>
                         <p><strong>Ingredientes:</strong> ${receita.ingredients.map(i => i.name).join(', ')}</p>
                         <div class="d-flex justify-content-between mt-3">
-                            <button class="btn btn-outline-primary btn-sm" type="button"
-                                onclick="verPreparoComVerificacao('${receita.title.replace(/'/g, "\\'")}', \`${receita.description.replace(/`/g, '\\`')}\`)">
+
+                            <button class="btn btn-outline-primary btn-sm"
+                                onclick="abrirReceita(${receita.id})">
                                 Ver preparo
                             </button>
+
                             ${userRole === "creator" ? `
                                 <button class="btn btn-outline-danger btn-sm" type="button"
                                     onclick="confirmarExclusao(${receita.id}, '${receita.title.replace(/'/g, "\\'")}')">
@@ -197,7 +199,6 @@
                         </div>
                     </div>
                 </div>
-                
             `;
             container.appendChild(div);
             });
@@ -291,6 +292,10 @@
 
 
         let receitaEditando = null;
+
+        function abrirReceita(id){
+            window.location.href = `/receitas/${id}/page`;
+        }
 
         function editarReceita(id) {
             const receita = todasReceitas.find(r => r.id === id);

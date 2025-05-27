@@ -116,7 +116,14 @@ def postar_comentario(recipe_id: int, comentario: ComentarioCreate, db: Session 
     db.commit()
     db.refresh(novo_comentario)
 
-    return novo_comentario
+    return ComentarioResponse(
+        id=novo_comentario.id,
+        text=novo_comentario.text,
+        star=novo_comentario.star,
+        author_id=novo_comentario.author_id,
+        recipe_id=novo_comentario.recipe_id,
+        username=current_user.username
+)
 
 @router.get("/receitas/{recipe_id}/comentarios", response_model=list[ComentarioResponse])
 def listar_comentarios(recipe_id: int, db: Session = Depends(get_db)):
@@ -125,4 +132,15 @@ def listar_comentarios(recipe_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Receita não encontrada")
 
     comentarios = db.query(Comentario).filter(Comentario.recipe_id == recipe_id).all()
-    return comentarios
+    
+    return [
+        {
+            "id": c.id,
+            "text": c.text,
+            "star": c.star,
+            "author_id": c.author_id,
+            "recipe_id": c.recipe_id,
+            "username": c.author.username 
+        }
+        for c in comentarios
+    ]

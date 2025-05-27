@@ -44,6 +44,7 @@ class UserDB(Base):
     hashed_password = Column(String)
     disabled = Column(Boolean, default=False)
     role = Column(String, default="client")
+    comentarios = relationship("Comentario", back_populates="author", cascade="all, delete-orphan")
 
 class Ingredient(Base):
     __tablename__ = "ingredients"
@@ -71,7 +72,8 @@ class Comentario(Base):
 
     recipe_id = Column(Integer, ForeignKey("recipes.id"), nullable=False)
     recipe = relationship("Recipe", back_populates="comentarios")
-    author = relationship("UserDB")
+    author = relationship("UserDB", back_populates="comentarios")
+    
 
 recipe_ingredients = Table(
     "recipe_ingredients",
@@ -112,7 +114,6 @@ class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str
 
-
 class ComentarioCreate(BaseModel):
     text: str
     star: int | None = None  
@@ -123,6 +124,7 @@ class ComentarioResponse(BaseModel):
     star: int | None = None
     author_id: int
     recipe_id: int
+    username: str  
 
-
-
+    class Config:
+        orm_mode = True

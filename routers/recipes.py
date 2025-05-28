@@ -3,8 +3,12 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from models import Comentario, ComentarioCreate, ComentarioResponse, Recipe, Ingredient, UserDB
-from models import RecipeCreate, RecipeResponse
+
+from models.comments import Comentario
+from models.recipes import Ingredient, Recipe
+from models.users import UserDB
+from schemas.comments import ComentarioCreate, ComentarioResponse
+from schemas.recipes import RecipeCreate, RecipeResponse
 from security import get_current_user, get_db, require_role
 
 router = APIRouter()

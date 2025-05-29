@@ -8,6 +8,7 @@ from database import SessionLocal
 from models.users import UserDB
 
 
+
 SECRET_KEY = "15b00b55306c9c044c11e1dac989087ca0d931a4632a3e251947042da4ac2812"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30

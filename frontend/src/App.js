@@ -8,12 +8,14 @@ import RecipesList from './components/Recipes/RecipesList';
 import LoginForm from './components/Auth/LoginForm';
 import RegisterForm from './components/Auth/RegisterForm';
 import { AuthProvider } from './contexts/AuthContext';
+import SearchBar from './components/SearchBar'; 
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Header />
+        <SearchBar />
           <Routes>
             <Route path="/" element={<RecipesList />} />
             <Route path="/login" element={<LoginForm />} />

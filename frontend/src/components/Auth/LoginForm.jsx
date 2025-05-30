@@ -1,9 +1,11 @@
 import AuthForm from "./AuthForm";
 import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginForm() {
 
     const { login } = useAuth();
+    const navigate = useNavigate()
 
     const fields = [
         { name: "username", label: "Usuário" },
@@ -14,6 +16,7 @@ export default function LoginForm() {
         try {
             const userInfo = await login(formData.username, formData.password);
             console.log(`acesso: ${userInfo.username} (${userInfo.role})`);
+            navigate('/');
 
 
         } catch (error) {

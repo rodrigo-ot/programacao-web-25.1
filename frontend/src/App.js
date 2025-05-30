@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import Header from './components/Header/Header';
 import RecipesList from './components/Recipes/RecipesList';
+import RecipePage from './components/Recipes/RecipePage';
 import LoginForm from './components/Auth/LoginForm';
 import RegisterForm from './components/Auth/RegisterForm';
 import { AuthProvider } from './contexts/AuthContext';
@@ -21,6 +22,7 @@ function App() {
             <Route path="/" element={<RecipesList />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
+            <Route path="/receitas/:id" element={<RecipePage />} /> 
           </Routes>
       </Router>
     </AuthProvider>

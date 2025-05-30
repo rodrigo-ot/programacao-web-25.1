@@ -1,9 +1,11 @@
 // src/components/RecipeCard.jsx
 import RecipeImage from './RecipeImage';
 import RecipeActions from './RecipeActions';
+import { useNavigate } from "react-router-dom";
 
 function RecipeCard({ recipe, userRole, onView, onEdit, onRemove }) {
   const ingredientsList = recipe.ingredients?.map(i => i.name).join(', ') || 'N/A';
+  const navigate = useNavigate();
 
   // Exibir ações apenas para creators (ou clients, se quiser):
   const canEdit = userRole === "creator" /*|| userRole === "client"*/;
@@ -21,7 +23,7 @@ function RecipeCard({ recipe, userRole, onView, onEdit, onRemove }) {
 
           <div className="flex justify-between items-center mt-4">
             <button
-              onClick={() => onView(recipe.id)}
+              onClick={() => navigate(`/receitas/${recipe.id}`)}
               className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm"
             >
               Ver preparo

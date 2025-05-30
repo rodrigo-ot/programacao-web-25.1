@@ -17,9 +17,15 @@ function App() {
     <AuthProvider>
       <Router>
         <Header />
-        <SearchBar />
           <Routes>
-            <Route path="/" element={<RecipesList />} />
+            {}
+            <Route path="/" element={
+                <>
+                  <SearchBar /> 
+                  <RecipesList />
+                </>
+              }
+            />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/receitas/:id" element={<RecipePage />} /> 
@@ -30,3 +36,5 @@ function App() {
 }
 
 export default App;
+
+

@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Request, Query
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import or_
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
@@ -15,20 +16,16 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-@router.get("/receitas/buscar", response_model=List[RecipeResponse])
-def buscar_receitas_por_ingrediente(
-    ingrediente: str = Query(..., description="Nome do ingrediente"),
-    db: Session = Depends(get_db)
-):
-    receitas = (
-        db.query(Recipe)
-        .join(Recipe.ingredients)
-        .filter(Ingredient.name.ilike(f"%{ingrediente}%"))
-        .options(joinedload(Recipe.ingredients))
-        .all()
-    )
+@router.get("/receitas/buscar")
+def buscar_receitas(query: str, db: Session = Depends(get_db)):
+    receitas = db.query(Recipe).filter(
+        or_(
+            Recipe.title.ilike(f"%{query}%"),
+            Recipe.ingredients.any(Ingredient.name.ilike(f"%{query}%"))
+        )
+    ).all()
+    return receitas
 
-    return receitas  # Retorna lista vazia se não encontrar, sem erro 404
 
 @router.get("/receitas", response_model=List[RecipeResponse])
 def listar_receitas(db: Session = Depends(get_db)):

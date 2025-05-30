@@ -6,8 +6,10 @@ import jwt
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from datetime import timedelta
-from models import PasswordReset, ResetPasswordRequest, UserRegistration, Token, User
-from models import UserDB
+
+from models.users import UserDB
+from schemas.reset_password import PasswordReset, ResetPasswordRequest
+from schemas.users import Token, UserRegistration
 from security import (
     ALGORITHM, SECRET_KEY, create_password_reset_token, get_current_user, get_password_hash, authenticate_user,
     create_access_token, get_db, require_role

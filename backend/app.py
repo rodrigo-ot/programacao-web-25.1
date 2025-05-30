@@ -2,12 +2,12 @@ from fastapi import APIRouter, FastAPI, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from models.users import UserDB
 from routers.auth_routes import auth_router
+from schemas.users import User
 from security import get_current_user, require_role
-from models import Recipe, User, UserDB 
-from pydantic import BaseModel
 from typing import List, Annotated
-from database import SessionLocal, engine
+from database import Base, SessionLocal, engine
 from sqlalchemy.orm import Session
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,6 +17,7 @@ app = FastAPI()
 app.include_router(recipes.router)
 router = APIRouter()
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
@@ -25,7 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from models import Base
+
 Base.metadata.create_all(bind=engine)
 
 # # Schemas Pydantic
@@ -90,6 +91,3 @@ def get_user_info(user = Depends(get_current_user)):
 
 app.include_router(router)
 
-@auth_router.get("/reset-password", response_class=HTMLResponse)
-def show_reset_form(request: Request, token: str):
-    return templates.TemplateResponse("reset_password_form.html", {"request": request, "token": token})

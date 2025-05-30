@@ -1,11 +1,13 @@
 from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
-from models import User
+
 from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException, status
 from database import SessionLocal
-from models import UserDB
+from models.users import UserDB
+
+
 
 SECRET_KEY = "15b00b55306c9c044c11e1dac989087ca0d931a4632a3e251947042da4ac2812"
 ALGORITHM = "HS256"

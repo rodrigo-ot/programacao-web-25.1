@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // Importe seus componentes
 import Header from './components/Header';
 import RecipesList from './components/RecipesList';
+import SearchBar from './components/SearchBar'; 
 // import OtherPage from './pages/OtherPage'; // Exemplo: se tiver outras páginas
 
 function App() {
@@ -12,7 +13,7 @@ function App() {
     <Router>
       {/* O Header fica fora das Routes se ele for aparecer em todas as páginas */}
       <Header />
-
+      <SearchBar />
       {/* Ocupa o restante do espaço vertical, se usar flexbox no body/html */}
       <main className="flex-grow">
         {/* As Rotas definem qual componente será renderizado para cada URL */}

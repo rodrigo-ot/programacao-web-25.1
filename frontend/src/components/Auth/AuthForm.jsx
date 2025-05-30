@@ -1,7 +1,19 @@
+// AuthForm.jsx
 import { useState } from "react";
 
 export default function AuthForm({ onSubmit, fields, title, submitText }) {
-  const [form, setForm] = useState({});
+  const [form, setForm] = useState(() => {
+    const initialForm = {};
+    fields.forEach(field => {
+      if (field.type === "select" && field.options && field.options.length > 0) {
+        initialForm[field.name] = field.options[0].value; 
+      } else {
+        initialForm[field.name] = ""; 
+      }
+    });
+    return initialForm;
+  });
+
   const [error, setError] = useState(null);
 
   const handleChange = (e) => {
@@ -13,8 +25,19 @@ export default function AuthForm({ onSubmit, fields, title, submitText }) {
     setError(null);
     try {
       await onSubmit(form);
+      setForm(() => {
+        const resetForm = {};
+        fields.forEach(field => {
+          if (field.type === "select" && field.options && field.options.length > 0) {
+            resetForm[field.name] = field.options[0].value;
+          } else {
+            resetForm[field.name] = "";
+          }
+        });
+        return resetForm;
+      });
     } catch (err) {
-      setError(err.message);
+      setError(err.message || String(err) || "Ocorreu um erro. Tente novamente.");
     }
   };
 
@@ -26,15 +49,32 @@ export default function AuthForm({ onSubmit, fields, title, submitText }) {
           <label htmlFor={f.name} className="block text-sm font-medium text-gray-700 mb-1">
             {f.label}
           </label>
-          <input
-            type={f.type || "text"}
-            id={f.name}
-            name={f.name}
-            value={form[f.name] || ""}
-            onChange={handleChange}
-            required
-            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          />
+          {f.type === "select" ? (
+            <select
+              id={f.name}
+              name={f.name}
+              value={form[f.name] || ""}
+              onChange={handleChange}
+              required
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              {f.options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input
+              type={f.type || "text"}
+              id={f.name}
+              name={f.name}
+              value={form[f.name] || ""}
+              onChange={handleChange}
+              required
+              className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          )}
         </div>
       ))}
       {error && (

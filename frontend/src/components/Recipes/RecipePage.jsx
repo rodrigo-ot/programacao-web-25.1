@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function RecipePage() {
@@ -68,6 +68,18 @@ export default function RecipePage() {
               <h1 className="text-5xl font-extrabold text-gray-900 mb-6">
                 {recipe.title}
               </h1>
+
+              {recipe.author && (
+                <p className="text-xl text-gray-600 mb-6">
+                  Por:{" "}
+                  <Link
+                    to={`/perfil/${recipe.author.id}`} // O link aponta para a rota do perfil com o ID do autor
+                    className="font-semibold text-emerald-600 hover:underline"
+                  >
+                    {recipe.author.username}
+                  </Link>
+                </p>
+              )}
 
               <p className="text-gray-700 mb-8 leading-relaxed text-lg">
                 {recipe.description}

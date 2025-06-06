@@ -17,6 +17,8 @@ class Recipe(Base):
 
     ingredients = relationship("Ingredient", secondary="recipe_ingredients", backref="recipes")
     comentarios = relationship("Comentario", back_populates="recipe", cascade="all, delete-orphan")
+    author_id = Column(Integer, ForeignKey("users.id"))
+    author = relationship("UserDB", backref="recipes")
 
 recipe_ingredients = Table(
     "recipe_ingredients",

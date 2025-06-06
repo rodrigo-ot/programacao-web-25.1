@@ -1,8 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useState } from "react";
 import { useAuth } from '../../contexts/AuthContext'; // Importa o hook de autenticação
+import CreateRecipeModal from "./CreateRecipeModal";
 
 function AuthButtons() {
+  const [showModal, setShowModal] = useState(false);
   const { user, logout } = useAuth(); // Obtém o usuário logado e a função de logout do contexto
 
   const handleLogout = () => {
@@ -37,14 +40,17 @@ function AuthButtons() {
         </>
       )}
 
-      {user && user.role === 'creator' && (
+      {user && user.role === "creator" && (
         <button
           id="post-button"
+          onClick={() => setShowModal(true)}
           className="btn bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg text-sm w-full sm:w-auto"
         >
           Postar Receita
         </button>
       )}
+      
+      <CreateRecipeModal isOpen={showModal} onClose={() => setShowModal(false)} />  
     </div>
   );
 }

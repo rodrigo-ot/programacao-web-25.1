@@ -38,6 +38,25 @@ export async function register(data) {
     return res.json(); // { message: "User registered successfully" }
 }
 
+export async function createRecipe(recipeData, token) {
+  const res = await fetch(`${API_URL}/post-recipe`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(recipeData),
+  });
+
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.detail || "Erro ao criar receita");
+  }
+
+  return res.json();
+}
+
+
 export async function getUserInfo(token) {
     const res = await fetch(`${API_URL}/me`, {
         headers: {

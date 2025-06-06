@@ -31,6 +31,7 @@ function App() {
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/receitas/:id" element={<RecipePage />} /> 
             <Route path="/perfil/:id" element={<ProfilePage />} />
+            <Route path="/perfil/u" element={<ProfilePage />} />
           </Routes>
       </Router>
     </AuthProvider>

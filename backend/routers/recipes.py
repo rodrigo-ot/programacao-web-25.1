@@ -1,6 +1,7 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, HTTPException, Request, Query
+from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import or_
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 
@@ -13,6 +14,18 @@ from security import get_current_user, get_db, require_role
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
+
+
+@router.get("/receitas/buscar")
+def buscar_receitas(query: str, db: Session = Depends(get_db)):
+    receitas = db.query(Recipe).filter(
+        or_(
+            Recipe.title.ilike(f"%{query}%"),
+            Recipe.ingredients.any(Ingredient.name.ilike(f"%{query}%"))
+        )
+    ).all()
+    return receitas
+
 
 @router.get("/receitas", response_model=List[RecipeResponse])
 def listar_receitas(db: Session = Depends(get_db)):

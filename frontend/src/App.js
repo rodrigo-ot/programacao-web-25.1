@@ -1,33 +1,40 @@
-// src/App.js (ou src/App.jsx)
+// src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-// Importe seus componentes
-import Header from './components/Header';
-import RecipesList from './components/RecipesList';
-// import OtherPage from './pages/OtherPage'; // Exemplo: se tiver outras páginas
+
+
+import Header from './components/Header/Header';
+import RecipesList from './components/Recipes/RecipesList';
+import RecipePage from './components/Recipes/RecipePage';
+import LoginForm from './components/Auth/LoginForm';
+import RegisterForm from './components/Auth/RegisterForm';
+import { AuthProvider } from './contexts/AuthContext';
+import SearchBar from './components/SearchBar'; 
 
 function App() {
   return (
-    <Router>
-      {/* O Header fica fora das Routes se ele for aparecer em todas as páginas */}
-      <Header />
-
-      {/* Ocupa o restante do espaço vertical, se usar flexbox no body/html */}
-      <main className="flex-grow">
-        {/* As Rotas definem qual componente será renderizado para cada URL */}
-        <Routes>
-          {/* A rota raiz '/' renderiza o RecipeList */}
-          <Route path="/" element={<RecipesList />} />
-          {/* Exemplo de outras rotas */}
-          {/* <Route path="/outra-pagina" element={<OtherPage />} /> */}
-        </Routes>
-      </main>
-
-      {/* Se você tiver um componente de rodapé, ele também ficaria aqui, fora das Routes */}
-      {/* <Footer /> */}
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Header />
+          <Routes>
+            {}
+            <Route path="/" element={
+                <>
+                  <SearchBar /> 
+                  <RecipesList />
+                </>
+              }
+            />
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/register" element={<RegisterForm />} />
+            <Route path="/receitas/:id" element={<RecipePage />} /> 
+          </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 
 export default App;
+
+

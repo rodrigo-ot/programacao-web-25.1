@@ -32,9 +32,9 @@ resend_api_key = os.getenv("RESEND_API_KEY")
 @auth_router.post("/register")
 def register_user(user: UserRegistration, db: Session = Depends(get_db)):
     if db.query(UserDB).filter(UserDB.username == user.username).first():
-        raise HTTPException(status_code=400, detail="Username already registered")
+        raise HTTPException(status_code=400, detail="Nome de usuário já registrado, tente outro.")
     if db.query(UserDB).filter(UserDB.email == user.email).first():
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="Email já registrado, tente outro.")
 
     hashed_password = get_password_hash(user.password)
     db_user = UserDB(

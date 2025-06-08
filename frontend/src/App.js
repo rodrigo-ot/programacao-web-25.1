@@ -12,6 +12,9 @@ import RegisterForm from './components/Auth/RegisterForm';
 import { AuthProvider } from './contexts/AuthContext';
 import SearchBar from './components/SearchBar'; 
 import ProfilePage from './components/Profile/ProfilePage';
+import ChatWidget from './components/IaChat/ChatWidget'; // Importa o componente de chat
+
+
 
 function App() {
   return (
@@ -24,6 +27,7 @@ function App() {
                 <>
                   <SearchBar /> 
                   <RecipesList />
+                  <ChatWidget />
                 </>
               }
             />

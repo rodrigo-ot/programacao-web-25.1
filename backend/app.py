@@ -2,6 +2,7 @@ from fastapi import APIRouter, FastAPI, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 from models.users import UserDB
 from routers.auth_routes import auth_router
 from schemas.users import User
@@ -12,10 +13,12 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from routers import recipes, author
+from routers.generate_recipe import router as generate_router
 
 app = FastAPI()
 app.include_router(recipes.router)
 app.include_router(author.router)
+app.include_router(generate_router)
 router = APIRouter()
 
 
@@ -91,3 +94,4 @@ def get_user_info(user = Depends(get_current_user)):
     }
 
 app.include_router(router)
+

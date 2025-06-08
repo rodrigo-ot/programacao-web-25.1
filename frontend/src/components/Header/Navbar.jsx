@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-
 function Navbar() {
   const [isNavOpen, setIsNavOpen] = useState(false);
 
@@ -53,25 +52,6 @@ function Navbar() {
               onClick={() => setIsNavOpen(false)}
             >
               Contato
-            </Link>
-          </li>
-          {/* Links de Login e Registro podem ser mostrados aqui no menu mobile se não estiverem nos botões */}
-          <li className="sm:hidden"> {/* Mostra Login/Registrar no nav mobile se não estiverem no container de botões */}
-            <Link
-              to="/login"
-              className="block py-2 px-3 text-gray-700 font-medium hover:text-indigo-600 rounded-md transition duration-200"
-              onClick={() => setIsNavOpen(false)}
-            >
-              Login
-            </Link>
-          </li>
-          <li className="sm:hidden">
-            <Link
-              to="/register"
-              className="block py-2 px-3 text-gray-700 font-medium hover:text-indigo-600 rounded-md transition duration-200"
-              onClick={() => setIsNavOpen(false)}
-            >
-              Registrar
             </Link>
           </li>
         </ul>

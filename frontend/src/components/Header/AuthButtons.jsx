@@ -35,7 +35,7 @@ function AuthButtons() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center focus:outline-none"
+        className="w-12 h-12 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center focus:outline-none"
       >
         {user ? (
           <span className="text-sm font-bold text-gray-700">

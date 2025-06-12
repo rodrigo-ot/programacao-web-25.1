@@ -49,24 +49,25 @@ function SearchBar() {
 
   return (
     <div className="relative bg-gray-100 px-6 py-4" ref={wrapperRef}>
-      <form
-        onSubmit={handleSearch}
-        className="flex gap-4 max-w-xl mx-auto"
+    <form
+      onSubmit={handleSearch}
+      className="flex items-center gap-2 sm:gap-4 max-w-xl mx-auto bg-white shadow-md rounded-full px-4 py-2 border border-gray-200 focus-within:ring-2 focus-within:ring-blue-500 transition"
+    >
+      <input
+        type="text"
+        placeholder="Buscar por ingrediente ou título..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="flex-1 bg-transparent outline-none text-gray-700 placeholder-gray-400 px-2 sm:px-4 py-2"
+      />
+      <button
+        type="submit"
+        className="px-4 sm:px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full transition"
       >
-        <input
-          type="text"
-          placeholder="Buscar por ingrediente ou título..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500"
-        />
-        <button
-          type="submit"
-          className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-        >
-          {loading ? "Buscando..." : "Buscar"}
-        </button>
-      </form>
+        {loading ? "Buscando..." : "Buscar"}
+      </button>
+    </form>
+
 
       {dropdownOpen && results.length > 0 && (
         <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-full max-w-xl bg-white rounded-md shadow-lg z-50">

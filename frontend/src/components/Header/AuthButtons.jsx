@@ -1,56 +1,106 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useState } from "react";
-import { useAuth } from '../../contexts/AuthContext'; // Importa o hook de autenticação
-import CreateRecipeModal from "./CreateRecipeModal";
+import React, { useState, useRef, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import CreateRecipeModal from './CreateRecipeModal';
 
 function AuthButtons() {
+  const { user, logout } = useAuth();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const { user, logout } = useAuth(); // Obtém o usuário logado e a função de logout do contexto
+  const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout(); 
+    logout();
+    setDropdownOpen(false);
   };
 
+  const handleProfile = () => {
+    navigate(`/perfil/u?username=${user.username}`);
+    setDropdownOpen(false);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
-    <div className="buttons-container flex flex-col sm:flex-row gap-2 mt-4 sm:mt-0 sm:ml-4">
-      {user ? (
-        // Se o usuário estiver logado, exibe "Encerrar sessão"
-        <button
-          onClick={handleLogout}
-          className="btn bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg text-sm w-full sm:w-auto"
-        >
-          Encerrar sessão
-        </button>
-      ) : (
-        // Se o usuário não estiver logado, exibe "Acessar conta" e "Criar conta"
-        <>
-          <Link
-            to="/login"
-            className="btn bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg text-sm w-full sm:w-auto text-center"
-          >
-            Acessar conta
-          </Link>
-          <Link
-            to="/register"
-            className="btn bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg text-sm w-full sm:w-auto text-center"
-          >
-            Criar conta
-          </Link>
-        </>
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setDropdownOpen(!dropdownOpen)}
+        className="w-12 h-12 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center focus:outline-none"
+      >
+        {user ? (
+          <span className="text-sm font-bold text-gray-700">
+            {user.username[0].toUpperCase()}
+          </span>
+        ) : (
+          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" strokeWidth="2"
+            viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round"
+              d="M5.121 17.804A4 4 0 016 16h12a4 4 0 01.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        )}
+      </button>
+
+      {dropdownOpen && (
+        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+          {user ? (
+            <>
+              <button
+                onClick={handleProfile}
+                
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Meu Perfil
+              </button>
+
+              {user.role === 'creator' && (
+                <button
+                  onClick={() => {
+                    setShowModal(true);
+                    setDropdownOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  Nova Receita
+                </button>
+              )}
+
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+              >
+                Sair
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Acessar conta
+              </Link>
+              <Link
+                to="/register"
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              >
+                Criar conta
+              </Link>
+            </>
+          )}
+        </div>
       )}
 
-      {user && user.role === "creator" && (
-        <button
-          id="post-button"
-          onClick={() => setShowModal(true)}
-          className="btn bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg text-sm w-full sm:w-auto"
-        >
-          Postar Receita
-        </button>
-      )}
-      
-      <CreateRecipeModal isOpen={showModal} onClose={() => setShowModal(false)} />  
+      <CreateRecipeModal isOpen={showModal} onClose={() => setShowModal(false)} />
     </div>
   );
 }

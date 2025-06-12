@@ -17,3 +17,18 @@ def get_author_profile(author_id: int, db: Session = Depends(get_db)):
     recipes = db.query(Recipe).filter(Recipe.author_id == author_id).all()
 
     return {"id": author.id, "username": author.username, "recipes": recipes}
+
+# gambiarra
+@router.get("/autores/username/{username}", response_model=AuthorProfileResponse)
+def get_author_profile_by_username(username: str, db: Session = Depends(get_db)):
+    author = db.query(UserDB).filter(UserDB.username == username).first()
+    if not author:
+        raise HTTPException(status_code=404, detail="Autor não encontrado")
+
+    recipes = db.query(Recipe).filter(Recipe.author_id == author.id).all()
+
+    return {
+        "id": author.id,
+        "username": author.username,
+        "recipes": recipes
+    }

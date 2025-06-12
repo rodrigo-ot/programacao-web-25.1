@@ -25,7 +25,7 @@ function RecipeList() {
       {recipes.length === 0 ? (
         <p className="text-gray-600 text-center text-lg">Nenhuma receita cadastrada.</p>
       ) : (
-        <div className="flex flex-wrap -mx-4">
+        <div className="flex flex-wrap -mx-4 justify-center">
           {recipes.map((recipe) => (
             <RecipeCard
               key={recipe.id}

@@ -11,10 +11,11 @@ from database import Base, SessionLocal, engine
 from sqlalchemy.orm import Session
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
-from routers import recipes
+from routers import recipes, author
 
 app = FastAPI()
 app.include_router(recipes.router)
+app.include_router(author.router)
 router = APIRouter()
 
 
@@ -90,4 +91,3 @@ def get_user_info(user = Depends(get_current_user)):
     }
 
 app.include_router(router)
-

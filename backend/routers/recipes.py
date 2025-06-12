@@ -9,7 +9,7 @@ from models.comments import Comentario
 from models.recipes import Ingredient, Recipe
 from models.users import UserDB
 from schemas.comments import ComentarioCreate, ComentarioResponse
-from schemas.recipes import RecipeCreate, RecipeResponse
+from schemas.recipes import AuthorProfileResponse, RecipeCreate, RecipeResponse
 from security import get_current_user, get_db, require_role
 
 router = APIRouter()
@@ -56,11 +56,16 @@ def pagina_receita(recipe_id: int, request: Request, db: Session = Depends(get_d
     )
 
 @router.post("/post-recipe", response_model=RecipeResponse, dependencies=[Depends(require_role("creator"))])
-def criar_receita(receita: RecipeCreate, db: Session = Depends(get_db)):
+def criar_receita(
+    receita: RecipeCreate,
+    db: Session = Depends(get_db),
+    current_user: UserDB = Depends(get_current_user) 
+):
     nova_receita = Recipe(
         title=receita.title,
         description=receita.description,
-        image_url=receita.image_url
+        image_url=receita.image_url,
+        author_id=current_user.id  
     )
 
     ingredientes = []
@@ -69,7 +74,7 @@ def criar_receita(receita: RecipeCreate, db: Session = Depends(get_db)):
         if not ingrediente:
             ingrediente = Ingredient(name=nome)
             db.add(ingrediente)
-            db.flush() 
+            db.flush()
         ingredientes.append(ingrediente)
 
     nova_receita.ingredients = ingredientes

@@ -11,6 +11,7 @@ import LoginForm from './components/Auth/LoginForm';
 import RegisterForm from './components/Auth/RegisterForm';
 import { AuthProvider } from './contexts/AuthContext';
 import SearchBar from './components/SearchBar'; 
+import ProfilePage from './components/Profile/ProfilePage';
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
             {}
             <Route path="/" element={
                 <>
-                  <SearchBar /> 
+                  {/* <SearchBar />  */}
                   <RecipesList />
                 </>
               }
@@ -29,6 +30,8 @@ function App() {
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
             <Route path="/receitas/:id" element={<RecipePage />} /> 
+            <Route path="/perfil/:id" element={<ProfilePage />} />
+            <Route path="/perfil/u" element={<ProfilePage />} />
           </Routes>
       </Router>
     </AuthProvider>

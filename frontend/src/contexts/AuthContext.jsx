@@ -53,8 +53,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const createRecipe = async (recipeData) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error("Usuário não autenticado");
+      const response = await authService.createRecipe(recipeData, token);
+      return response;
+    } catch (error) {
+      console.error("Erro ao criar receita:", error);
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loadingAuth, login, logout, register }}>
+    <AuthContext.Provider value={{ user, loadingAuth, login, logout, register, createRecipe }}>
       {children}
     </AuthContext.Provider>
   );

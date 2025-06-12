@@ -4,6 +4,7 @@ import Navbar from './Navbar'; // Importa o novo componente
 import AuthButtons from './AuthButtons'; // Importa o novo componente
 import SearchBar from '../SearchBar';
 
+
 function Header() {
   return (
 <header className="bg-gray-100 border-b border-gray-300 shadow-sm py-3">
@@ -13,7 +14,6 @@ function Header() {
     <div className="flex-1 flex items-center">
       <LogoAndSitename />
     </div>
-
     {/* Navbar - ocupa 1/3 e centralizado */}
     <nav className="flex-1 flex justify-center">
       <Navbar />
@@ -26,8 +26,6 @@ function Header() {
     </div>
   </div>
 </header>
-
-
 
   );
 }

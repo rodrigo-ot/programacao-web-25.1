@@ -7,8 +7,7 @@ function RecipeCard({ recipe, userRole, onView, onEdit, onRemove }) {
   const ingredientsList = recipe.ingredients?.map(i => i.name).join(', ') || 'N/A';
   const navigate = useNavigate();
 
-  // Exibir ações apenas para creators (ou clients, se quiser):
-  const canEdit = userRole === "creator" /*|| userRole === "client"*/;
+  const canEdit = userRole === "creator" 
 
   return (
     <div className="w-full sm:w-1/2 lg:w-1/3 px-4 mb-6">

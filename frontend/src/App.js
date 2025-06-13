@@ -10,9 +10,8 @@ import RecipePage from './components/Recipes/RecipePage';
 import LoginForm from './components/Auth/LoginForm';
 import RegisterForm from './components/Auth/RegisterForm';
 import { AuthProvider } from './contexts/AuthContext';
-import SearchBar from './components/SearchBar'; 
 import ProfilePage from './components/Profile/ProfilePage';
-import ChatWidget from './components/IaChat/ChatWidget'; // Importa o componente de chat
+import ChatWidget from './components/IaChat/ChatWidget'; 
 
 
 

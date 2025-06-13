@@ -17,7 +17,7 @@ async def generate_text(data: PromptInput):
     """
     system_instruction = (
         "Você é um assistente de culinária. Sua tarefa é criar uma receita simples e "
-        "saborosa usando os seguintes ingredientes. Forneça o nome da receita, "
+        "usando os seguintes ingredientes. Forneça o nome da receita, "
         "uma lista de ingredientes e um modo de preparo claro e conciso.\n\n"
         "Ingredientes fornecidos: "
     )
